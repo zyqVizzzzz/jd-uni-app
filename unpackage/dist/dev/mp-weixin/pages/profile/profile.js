@@ -115,6 +115,57 @@ const _sfc_main = {
         }
       });
     };
+    const chooseAvatar = async () => {
+      try {
+        const res = await common_vendor.index.chooseImage({
+          count: 1,
+          sizeType: ["compressed"],
+          sourceType: ["album", "camera"]
+        });
+        if (res.tempFilePaths && res.tempFilePaths[0]) {
+          const filePath = res.tempFilePaths[0];
+          await uploadAvatar(filePath);
+        }
+      } catch (error) {
+        console.error("选择图片失败:", error);
+        common_vendor.index.showToast({
+          title: "选择图片失败",
+          icon: "none"
+        });
+      }
+    };
+    const uploadAvatar = async (filePath) => {
+      try {
+        common_vendor.index.showLoading({
+          title: "上传中..."
+        });
+        const uploadRes = await common_vendor.index.uploadFile({
+          url: "http://localhost:3000/users/me/avatar",
+          filePath,
+          name: "avatar",
+          header: {
+            Authorization: `Bearer ${common_vendor.index.getStorageSync("token")}`
+          }
+        });
+        common_vendor.index.hideLoading();
+        if (uploadRes.data.code === 200 || uploadRes.data.code === 201) {
+          common_vendor.index.showToast({
+            title: "上传成功",
+            icon: "success"
+          });
+          await fetchUserInfo();
+        } else {
+          throw new Error("上传失败");
+        }
+      } catch (error) {
+        common_vendor.index.hideLoading();
+        console.error("上传头像失败:", error);
+        common_vendor.index.showToast({
+          title: "上传失败",
+          icon: "none"
+        });
+      }
+    };
     const showBioInput = () => {
       common_vendor.index.showModal({
         title: "修改简介",
@@ -183,34 +234,35 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: userInfo.value.avatarUrl || "/static/avatar-default@3x.png",
-        b: common_vendor.t(userInfo.value.nickname || "未设置"),
-        c: common_vendor.o(showNicknameInput),
-        d: common_vendor.t(userInfo.value.bio || "未设置"),
-        e: common_vendor.o(showBioInput),
-        f: !userInfo.value.phone
+        b: common_vendor.o(chooseAvatar),
+        c: common_vendor.t(userInfo.value.nickname || "未设置"),
+        d: common_vendor.o(showNicknameInput),
+        e: common_vendor.t(userInfo.value.bio || "未设置"),
+        f: common_vendor.o(showBioInput),
+        g: !userInfo.value.phone
       }, !userInfo.value.phone ? {
-        g: common_vendor.o(getPhoneNumber)
+        h: common_vendor.o(getPhoneNumber)
       } : {}, {
-        h: common_vendor.t(genderOptions[userInfo.value.gender] || "未设置"),
-        i: common_vendor.o(handleGenderChange),
-        j: userInfo.value.gender || 0,
-        k: genderOptions,
-        l: common_vendor.t(userInfo.value.birthday || "未设置"),
-        m: userInfo.value.birthday || currentDate.value,
-        n: startDate.value,
-        o: endDate.value,
-        p: common_vendor.o(handleBirthdayChange),
-        q: common_vendor.t(userInfo.value.weight ? `${userInfo.value.weight}kg` : "未设置"),
-        r: common_vendor.o(handleWeightChange),
-        s: weightIndex.value,
-        t: common_vendor.unref(weightOptions),
-        v: common_vendor.t(userInfo.value.height ? `${userInfo.value.height}cm` : "未设置"),
-        w: common_vendor.o(handleHeightChange),
-        x: heightIndex.value,
-        y: common_vendor.unref(heightOptions),
-        z: common_vendor.t(userInfo.value.city + " " + userInfo.value.district || "未设置"),
-        A: common_vendor.o(handleCityChange),
-        B: cityArray.value
+        i: common_vendor.t(genderOptions[userInfo.value.gender] || "未设置"),
+        j: common_vendor.o(handleGenderChange),
+        k: userInfo.value.gender || 0,
+        l: genderOptions,
+        m: common_vendor.t(userInfo.value.birthday || "未设置"),
+        n: userInfo.value.birthday || currentDate.value,
+        o: startDate.value,
+        p: endDate.value,
+        q: common_vendor.o(handleBirthdayChange),
+        r: common_vendor.t(userInfo.value.weight ? `${userInfo.value.weight}kg` : "未设置"),
+        s: common_vendor.o(handleWeightChange),
+        t: weightIndex.value,
+        v: common_vendor.unref(weightOptions),
+        w: common_vendor.t(userInfo.value.height ? `${userInfo.value.height}cm` : "未设置"),
+        x: common_vendor.o(handleHeightChange),
+        y: heightIndex.value,
+        z: common_vendor.unref(heightOptions),
+        A: common_vendor.t(userInfo.value.city + " " + userInfo.value.district || "未设置"),
+        B: common_vendor.o(handleCityChange),
+        C: cityArray.value
       });
     };
   }

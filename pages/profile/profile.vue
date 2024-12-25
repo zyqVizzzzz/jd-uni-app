@@ -1,11 +1,12 @@
 <template>
 	<view class="profile-edit-page">
 		<view class="section">
-			<view class="list-item">
+			<view class="list-item" @tap="chooseAvatar">
 				<text class="label">头像</text>
 				<image
 					class="avatar"
 					:src="userInfo.avatarUrl || '/static/avatar-default@3x.png'"
+					mode="aspectFill"
 				/>
 			</view>
 			<view class="list-item" @click="showNicknameInput">
@@ -249,6 +250,67 @@ const showNicknameInput = () => {
 			}
 		},
 	});
+};
+
+const chooseAvatar = async () => {
+	try {
+		const res = await uni.chooseImage({
+			count: 1,
+			sizeType: ["compressed"],
+			sourceType: ["album", "camera"],
+		});
+
+		if (res.tempFilePaths && res.tempFilePaths[0]) {
+			const filePath = res.tempFilePaths[0];
+
+			// 上传图片
+			await uploadAvatar(filePath);
+		}
+	} catch (error) {
+		console.error("选择图片失败:", error);
+		uni.showToast({
+			title: "选择图片失败",
+			icon: "none",
+		});
+	}
+};
+
+const uploadAvatar = async (filePath) => {
+	try {
+		uni.showLoading({
+			title: "上传中...",
+		});
+
+		const uploadRes = await uni.uploadFile({
+			url: "http://localhost:3000/users/me/avatar",
+			filePath: filePath,
+			name: "avatar",
+			header: {
+				Authorization: `Bearer ${uni.getStorageSync("token")}`,
+			},
+		});
+
+		uni.hideLoading();
+
+		if (uploadRes.data.code === 200 || uploadRes.data.code === 201) {
+			uni.showToast({
+				title: "上传成功",
+				icon: "success",
+			});
+
+			// 重新获取用户信息以更新头像
+			await fetchUserInfo();
+		} else {
+			throw new Error("上传失败");
+		}
+	} catch (error) {
+		uni.hideLoading();
+		console.error("上传头像失败:", error);
+		uni.showToast({
+			title: "上传失败",
+			icon: "none",
+		});
+	}
 };
 
 // 简介编辑
