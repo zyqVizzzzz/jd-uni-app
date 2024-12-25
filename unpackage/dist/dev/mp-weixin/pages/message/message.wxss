@@ -1,0 +1,60 @@
+/* 水平间距 */
+/* 水平间距 */
+.message-center.data-v-4c1b26cf {
+  min-height: 100vh;
+  background: #fff;
+}
+.message-list.data-v-4c1b26cf {
+  padding: 0 30rpx;
+}
+.message-list .message-item.data-v-4c1b26cf {
+  display: flex;
+  align-items: flex-start;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+.message-list .message-item .avatar.data-v-4c1b26cf {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+.message-list .message-item .icon-wrapper.data-v-4c1b26cf {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+}
+.message-list .message-item .icon-wrapper.bell.data-v-4c1b26cf {
+  color: #ffd100;
+}
+.message-list .message-item .icon-wrapper.bell .iconfont.data-v-4c1b26cf::before {
+  content: "\e601";
+}
+.message-list .message-item .icon-wrapper.email.data-v-4c1b26cf {
+  color: #ffd100;
+}
+.message-list .message-item .icon-wrapper.email .iconfont.data-v-4c1b26cf::before {
+  content: "\e602";
+}
+.message-list .message-item .message-content.data-v-4c1b26cf {
+  flex: 1;
+}
+.message-list .message-item .message-content .message-title.data-v-4c1b26cf {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+.message-list .message-item .message-content .message-text.data-v-4c1b26cf {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+.message-list .message-item .message-content .message-time.data-v-4c1b26cf {
+  font-size: 24rpx;
+  color: #999;
+}

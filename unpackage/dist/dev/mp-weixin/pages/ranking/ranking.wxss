@@ -1,0 +1,243 @@
+
+.ranking-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding-bottom: 120rpx; /* 为固定底部预留空间 */
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx 32rpx 0;
+}
+.rules {
+  font-size: 28rpx;
+}
+.location-toggle {
+  display: flex;
+  background: #f1f1f1; /* 深一点的灰色背景 */
+  border-radius: 32rpx;
+  padding: 4rpx;
+}
+.toggle-item {
+  padding: 12rpx 32rpx;
+  font-size: 24rpx;
+  color: #666;
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+}
+.toggle-item.active {
+  background: #333;
+  color: #fff;
+}
+.arrow {
+  font-size: 20rpx;
+  margin-left: 8rpx;
+}
+.time-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 64rpx;
+  margin: 32rpx 0 112rpx;
+}
+.tab-item {
+  position: relative;
+  padding: 16rpx 0;
+}
+.tab-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -4rpx;
+  left: 0;
+  width: 100%;
+  height: 8rpx;
+  background-color: #ffc107;
+  border-radius: 4rpx;
+}
+.top-three {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 32rpx;
+  padding-bottom: 0;
+  gap: 32rpx;
+}
+.rank-flag {
+  position: relative;
+  width: 220rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 20rpx 32rpx;
+  border-radius: 24rpx;
+}
+.circle-outer {
+  position: absolute;
+  top: -80rpx;
+  width: 136rpx; /* 比内层稍大，形成白边 */
+  height: 136rpx;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.circle-wrapper {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.rank-num {
+  width: 64rpx;
+  height: 64rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  margin: 16rpx 0;
+}
+.rank-flag.yellow .name {
+  color: rgba(240, 184, 0, 1);
+  font-weight: bold;
+}
+.rank-flag.orange .name {
+  color: rgba(214, 108, 15, 1);
+  font-weight: bold;
+}
+.rank-flag.pink .name {
+  color: rgba(179, 91, 158, 1);
+  font-weight: bold;
+}
+.score {
+  font-size: 40rpx;
+  font-weight: bold;
+}
+.unit {
+  font-size: 24rpx;
+  color: rgba(0, 0, 0, 0.4);
+  margin: 8rpx 0 16rpx;
+}
+/* 背景色 */
+.yellow {
+  background: linear-gradient(to bottom, #ffe27d 0%, #ffffff 75%, #ffffff 100%);
+}
+.orange {
+  background: linear-gradient(to bottom, #ffd7b5 0%, #ffffff 75%, #ffffff 100%);
+}
+.pink {
+  background: linear-gradient(to bottom, #ffe0ed 0%, #ffffff 75%, #ffffff 100%);
+}
+
+/* 第一名特殊处理 */
+.rank-flag:nth-child(2) {
+  transform: translateY(-32rpx);
+}
+.rank-flag:nth-child(2) .avatar {
+  width: 140rpx;
+  height: 140rpx;
+}
+.name {
+  font-size: 28rpx;
+  margin: 8rpx 0;
+}
+.distance {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+.btn-follow {
+  margin-top: 16rpx;
+  padding: 12rpx 32rpx;
+  background: #ffd100;
+  border-radius: 4rpx;
+  font-size: 24rpx;
+}
+.followed {
+  color: rgba(255, 195, 0, 1);
+  background: rgba(255, 250, 224, 1);
+}
+.rank-list {
+  padding: 0 32rpx;
+  padding-top: 0;
+}
+.rank-list .rank-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+.rank-list .rank-num {
+  font-size: 40rpx;
+  color: #999;
+  width: 60rpx;
+  margin-right: 30rpx;
+}
+.current-user .rank-num {
+  font-size: 40rpx;
+  color: rgba(255, 195, 0, 1);
+  width: 60rpx;
+  margin-right: 30rpx;
+  background: transparent;
+}
+.current-user .avatar,
+.rank-list .avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin: 0 24rpx;
+}
+.current-user .info,
+.rank-list .info {
+  display: flex;
+  flex-direction: column;
+}
+.rank-list .name {
+  font-size: 32rpx;
+  color: #333;
+}
+.distance {
+  font-size: 28rpx;
+  color: #999;
+}
+.current-user {
+  position: fixed;
+  bottom: 0rpx;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 212, 1) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  padding: 24rpx 32rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+.current-user .avatar {
+  width: 100rpx;
+  height: 100rpx;
+}
+.trend {
+  display: flex;
+  align-items: center;
+}
+.trend-num {
+  color: #ff5252;
+  margin-right: 4rpx;
+}
+.trend-icon {
+  color: #ff5252;
+}

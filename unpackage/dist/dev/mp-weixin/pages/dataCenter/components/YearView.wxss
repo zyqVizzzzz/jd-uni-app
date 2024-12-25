@@ -1,0 +1,60 @@
+/* 水平间距 */
+/* 水平间距 */
+.year-view .data-summary {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+}
+.year-view .data-summary-container {
+  margin-top: 10px;
+}
+.year-view .data-summary-container .data-summary {
+  margin-top: 10px;
+}
+.year-view .data-summary-container .data-summary-title {
+  padding-left: 15px;
+  color: #606266;
+}
+.year-view .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.year-view .row:last-child {
+  margin-bottom: 0;
+}
+.year-view .item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.year-view .row .item:last-child {
+  padding-left: 30px;
+}
+.year-view .label {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 4px;
+}
+.year-view .value {
+  font-size: 24px;
+  font-weight: bold;
+}
+.year-view .value.blue {
+  color: #00bcd4;
+}
+.year-view .value.orange {
+  color: #ffc107;
+}
+.year-view .value.red {
+  color: #ff5252;
+}
+.year-view .value.purple {
+  color: #9c27b0;
+}
+.year-view .no-data {
+  text-align: center;
+  color: #999;
+  padding: 20px 0;
+}

@@ -1,0 +1,100 @@
+/* 水平间距 */
+/* 水平间距 */
+.finding-device-page {
+  background-color: #ffffff;
+  min-height: 100vh;
+  /* 蓝牙列表容器样式 */
+}
+.finding-device-page .device-status {
+  padding-top: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.finding-device-page .device-image-container {
+  width: 320rpx;
+  height: 320rpx;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.finding-device-page .status-image {
+  width: 320rpx;
+  height: 320rpx;
+}
+.finding-device-page .status-text {
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+.finding-device-page .dots {
+  font-size: 36rpx;
+  color: #999;
+  display: flex;
+  gap: 5px;
+}
+.finding-device-page .bluetooth-list-box {
+  padding: 15px;
+  box-sizing: border-box;
+}
+.finding-device-page .bluetooth-list-container {
+  height: 500rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow-y: scroll;
+  border: 1px solid #e0e0e0;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  /* 隐藏滚动条，仅在web环境有效 */
+}
+.finding-device-page .bluetooth-list-container::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
+.finding-device-page .bluetooth-device-item {
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #e0e0e0;
+}
+.finding-device-page .bluetooth-device-item:last-child {
+  border-bottom: none;
+}
+.finding-device-page .device-name {
+  font-size: 28rpx;
+  color: #333;
+}
+.finding-device-page .action.contact {
+  margin-top: 10px;
+}
+.finding-device-page .action.contact .find-device-button {
+  background-color: #C0C4CC;
+  color: #606266;
+  padding: 20rpx 20px;
+  margin: 0 20px;
+  border: none;
+  border-radius: 108rpx;
+  font-size: 32rpx;
+}
+.finding-device-page .action.contact button::after {
+  border: none;
+}
+.finding-device-page .action {
+  margin-top: 30px;
+  text-align: center;
+}
+.finding-device-page .action .find-device-button {
+  background-color: #ffcc00;
+  color: #000;
+  padding: 20rpx 20px;
+  margin: 0 20px;
+  border: none;
+  border-radius: 108rpx;
+  font-size: 32rpx;
+}
+.finding-device-page .action button::after {
+  border: none;
+}

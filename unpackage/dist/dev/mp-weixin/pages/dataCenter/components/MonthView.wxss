@@ -1,0 +1,76 @@
+/* 水平间距 */
+/* 水平间距 */
+.month-view .month-calendar .uni-calendar__header {
+  padding: 10px;
+  /* 隐藏切换到周月日视图的按钮 */
+}
+.month-view .month-calendar .uni-calendar__header .uni-calendar__header-btn-box {
+  display: none;
+}
+.month-view .month-calendar .uni-calendar__box {
+  /* 隐藏日期部分 */
+}
+.month-view .month-calendar .uni-calendar__box .uni-calendar__weeks {
+  display: none;
+}
+.month-view .month-calendar .uni-calendar__box .uni-calendar__body {
+  display: none;
+}
+.month-view .data-summary {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+}
+.month-view .data-summary-container {
+  margin-top: 10px;
+}
+.month-view .data-summary-container .data-summary {
+  margin-top: 10px;
+}
+.month-view .data-summary-container .data-summary-title {
+  padding-left: 15px;
+  color: #606266;
+}
+.month-view .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.month-view .row:last-child {
+  margin-bottom: 0;
+}
+.month-view .item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.month-view .row .item:last-child {
+  padding-left: 30px;
+}
+.month-view .label {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 4px;
+}
+.month-view .value {
+  font-size: 24px;
+  font-weight: bold;
+}
+.month-view .value.blue {
+  color: #00bcd4;
+}
+.month-view .value.orange {
+  color: #ffc107;
+}
+.month-view .value.red {
+  color: #ff5252;
+}
+.month-view .value.purple {
+  color: #9c27b0;
+}
+.month-view .no-data {
+  text-align: center;
+  color: #999;
+  padding: 20px 0;
+}

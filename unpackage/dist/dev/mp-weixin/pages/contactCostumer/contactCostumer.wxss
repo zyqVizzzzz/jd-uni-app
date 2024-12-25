@@ -1,0 +1,32 @@
+
+.support-page.data-v-dcd6cd7c {
+		background-color: #f9f9f9;
+		min-height: 100vh;
+		padding: 16px;
+}
+.qr-section.data-v-dcd6cd7c {
+		display: flex;
+		justify-content: center;
+		margin: 40px 0;
+}
+.qr-code.data-v-dcd6cd7c {
+		width: 200px;
+		height: 200px;
+		border: 8px solid #FFDA00;
+		border-radius: 16px;
+}
+.support-info.data-v-dcd6cd7c {
+		text-align: center;
+		margin-top: 20px;
+}
+.text.data-v-dcd6cd7c {
+		display: block;
+		font-size: 16px;
+		color: #333;
+		line-height: 1.5;
+}
+.text.data-v-dcd6cd7c:first-child{
+		color: #333333;
+		font-size: 18px;
+		margin-bottom: 10px;
+}

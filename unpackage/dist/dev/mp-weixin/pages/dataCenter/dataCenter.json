@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "数据中心",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "day-view": "./components/DayView",
+    "week-view": "./components/WeekView",
+    "month-view": "./components/MonthView",
+    "year-view": "./components/YearView",
+    "total-view": "./components/TotalView"
+  }
+}

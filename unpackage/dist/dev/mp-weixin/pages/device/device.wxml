@@ -1,0 +1,1 @@
+<view class="add-device-page"><view class="device-step"><text class="step-title">1.设备添加说明</text><view class="device-image-placeholder"></view></view><view class="device-step"><text class="step-title">2.设备添加说明</text><view class="device-image-placeholder"></view></view><view class="action"><button bindtap="{{a}}" class="find-device-button"> 查找设备 </button></view></view>

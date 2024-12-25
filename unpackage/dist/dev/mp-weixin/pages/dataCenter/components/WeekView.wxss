@@ -1,0 +1,61 @@
+/* 水平间距 */
+/* 水平间距 */
+.week-view .data-summary.data-v-9a5c57ee {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 10px;
+}
+.week-view .data-summary-container.data-v-9a5c57ee {
+  margin-top: 10px;
+}
+.week-view .data-summary-container .data-summary.data-v-9a5c57ee {
+  margin-top: 10px;
+}
+.week-view .data-summary-container .data-summary-title.data-v-9a5c57ee {
+  padding-left: 15px;
+  color: #606266;
+}
+.week-view .row.data-v-9a5c57ee {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.week-view .row.data-v-9a5c57ee:last-child {
+  margin-bottom: 0px;
+}
+.week-view .item.data-v-9a5c57ee {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.week-view .row .item.data-v-9a5c57ee:last-child {
+  padding-left: 30px;
+}
+.week-view .label.data-v-9a5c57ee {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 4px;
+}
+.week-view .value.data-v-9a5c57ee {
+  font-size: 24px;
+  font-weight: bold;
+}
+.week-view .value.blue.data-v-9a5c57ee {
+  color: #00bcd4;
+}
+.week-view .value.orange.data-v-9a5c57ee {
+  color: #ffc107;
+}
+.week-view .value.red.data-v-9a5c57ee {
+  color: #ff5252;
+}
+.week-view .value.purple.data-v-9a5c57ee {
+  color: #9c27b0;
+}
+.week-view .no-data.data-v-9a5c57ee {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+  font-size: 28rpx;
+}

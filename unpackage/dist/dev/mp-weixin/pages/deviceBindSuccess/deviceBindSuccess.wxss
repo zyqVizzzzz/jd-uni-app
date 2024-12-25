@@ -1,0 +1,50 @@
+/* 水平间距 */
+/* 水平间距 */
+.finding-device-page {
+  background-color: #ffffff;
+  min-height: 100vh;
+  padding: 15px;
+  box-sizing: border-box;
+}
+.finding-device-page .device-status {
+  padding-top: 120rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 240px;
+}
+.finding-device-page .device-image-container {
+  width: 400rpx;
+  height: 400rpx;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.finding-device-page .status-image {
+  width: 400rpx;
+  height: 400rpx;
+}
+.finding-device-page .status-text {
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 10px;
+}
+.finding-device-page .action {
+  margin-top: 30px;
+  text-align: center;
+}
+.finding-device-page .find-device-button {
+  background-color: #ffcc00;
+  color: #000;
+  padding: 20rpx 20px;
+  border: none;
+  border-radius: 108rpx;
+  font-size: 32rpx;
+  margin-top: 100rpx;
+}
+.finding-device-page button::after {
+  border: none;
+}

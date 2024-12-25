@@ -1,0 +1,59 @@
+/* 水平间距 */
+/* 水平间距 */
+.weight-scale.data-v-448ae7b0 {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  -webkit-user-select: none;
+          user-select: none;
+}
+.weight-scale .scale-container.data-v-448ae7b0 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40rpx;
+}
+.weight-scale .number-display.data-v-448ae7b0 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40rpx;
+}
+.weight-scale .number-display .number.data-v-448ae7b0 {
+  font-size: 34px;
+  color: #999;
+  transition: all 0.3s;
+}
+.weight-scale .number-display .number.active.data-v-448ae7b0 {
+  font-size: 58px;
+  color: #333;
+  font-weight: 500;
+}
+.weight-scale .scale-marks.data-v-448ae7b0 {
+  width: 100%;
+  height: 100rpx;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 12rpx;
+  padding: 0 40rpx;
+  box-sizing: border-box;
+}
+.weight-scale .scale-marks .mark.data-v-448ae7b0 {
+  width: 4rpx;
+  height: 24rpx;
+  background-color: #ffe168;
+  transition: all 0.2s;
+}
+.weight-scale .scale-marks .mark.long.data-v-448ae7b0 {
+  height: 40rpx;
+}
+.weight-scale .scale-marks .mark.active.data-v-448ae7b0 {
+  height: 60rpx;
+  width: 6rpx;
+  background-color: #ffda00;
+}
