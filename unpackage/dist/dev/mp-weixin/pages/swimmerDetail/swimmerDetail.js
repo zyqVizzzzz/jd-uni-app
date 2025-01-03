@@ -16,8 +16,10 @@ const _sfc_main = {
     const inputFocus = common_vendor.ref(false);
     const replyTo = common_vendor.ref(null);
     const fetchPostDetail = async (id) => {
+      var _a;
       try {
         const res = await api_moments.momentApi.getMomentDetail(id);
+        const currentUserId = JSON.parse(common_vendor.index.getStorageSync("userInfo"))._id;
         if (res.data.code === 200) {
           const data = res.data.data;
           console.log(data);
@@ -29,6 +31,7 @@ const _sfc_main = {
             content: data.content,
             images: data.images || [],
             isFollowed: data.isFollowed,
+            isLiked: (_a = data.likedBy) == null ? void 0 : _a.includes(currentUserId),
             likes: data.likeCount,
             comments: data.commentCount,
             shares: data.shareCount || 0
@@ -112,12 +115,27 @@ const _sfc_main = {
         icon: "success"
       });
     };
-    const handleLike = () => {
-      post.value.likes++;
-      common_vendor.index.showToast({
-        title: "点赞成功",
-        icon: "success"
-      });
+    const handleLike = async () => {
+      try {
+        const res = await api_moments.momentApi.likeMoment(post.value.id);
+        if (res.data.code === 201) {
+          const { liked } = res.data.data;
+          post.value.likes += liked ? 1 : -1;
+          post.value.isLiked = liked;
+          common_vendor.index.showToast({
+            title: liked ? "点赞成功" : "取消点赞",
+            icon: "success"
+          });
+        } else {
+          throw new Error(res.data.message || "操作失败");
+        }
+      } catch (error) {
+        console.error("点赞操作失败:", error);
+        common_vendor.index.showToast({
+          title: error.message || "操作失败",
+          icon: "none"
+        });
+      }
     };
     const handleShare = () => {
       common_vendor.index.showShareMenu({
@@ -157,12 +175,13 @@ const _sfc_main = {
           };
         })
       } : {}, {
-        j: common_vendor.t(post.value.likes),
-        k: common_vendor.o(handleLike),
-        l: common_vendor.t(post.value.comments),
-        m: common_vendor.t(post.value.shares),
-        n: common_vendor.o(handleShare),
-        o: common_vendor.f(commentList.value, (comment, k0, i0) => {
+        j: post.value.isLiked ? "/static/icons/moments-share.png" : "/static/icons/moments-like.png",
+        k: common_vendor.t(post.value.likes),
+        l: common_vendor.o(handleLike),
+        m: common_vendor.t(post.value.comments),
+        n: common_vendor.t(post.value.shares),
+        o: common_vendor.o(handleShare),
+        p: common_vendor.f(commentList.value, (comment, k0, i0) => {
           return common_vendor.e({
             a: comment.author.avatarUrl,
             b: !comment.parentComment
@@ -178,17 +197,17 @@ const _sfc_main = {
             i: comment._id
           });
         }),
-        p: replyTo.value ? `回复 @${replyTo.value.author.nickname}` : "说点什么吧...",
-        q: inputFocus.value,
-        r: common_vendor.o(handleInputBlur),
-        s: commentText.value,
-        t: common_vendor.o(($event) => commentText.value = $event.detail.value),
-        v: replyTo.value
+        q: replyTo.value ? `回复 @${replyTo.value.author.nickname}` : "说点什么吧...",
+        r: inputFocus.value,
+        s: common_vendor.o(handleInputBlur),
+        t: commentText.value,
+        v: common_vendor.o(($event) => commentText.value = $event.detail.value),
+        w: replyTo.value
       }, replyTo.value ? {
-        w: common_vendor.o(cancelReply)
+        x: common_vendor.o(cancelReply)
       } : {}, {
-        x: commentText.value.length > 0 ? 1 : "",
-        y: common_vendor.o(handleSendComment)
+        y: commentText.value.length > 0 ? 1 : "",
+        z: common_vendor.o(handleSendComment)
       });
     };
   }

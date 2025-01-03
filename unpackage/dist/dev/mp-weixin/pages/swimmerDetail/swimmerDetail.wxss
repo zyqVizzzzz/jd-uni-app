@@ -86,10 +86,15 @@ button.data-v-fb374706::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8rpx;
 }
-.interaction-bar .action-item .icon.data-v-fb374706 {
-  font-size: 32rpx;
-  margin-right: 8rpx;
+.interaction-bar .action-item .action-icon.data-v-fb374706 {
+  width: 42rpx;
+  height: 42rpx;
+  transition: transform 0.2s ease;
+}
+.interaction-bar .action-item .action-item:active .action-icon.data-v-fb374706 {
+  transform: scale(1.2);
 }
 .interaction-bar .action-item .count.data-v-fb374706 {
   font-size: 24rpx;

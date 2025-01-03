@@ -74,21 +74,36 @@
 								<text class="data-label">消耗热量</text>
 							</view>
 						</view>
-
-						<!-- 互动区域 -->
-						<view class="interaction-bar">
-							<view class="action-item" @tap="handleLike(post)">
-								<text class="icon">❤️</text>
-								<text class="count">{{ post.likes }}</text>
-							</view>
-							<view class="action-item" @tap="handleComment(post)">
-								<text class="icon">💬</text>
-								<text class="count">{{ post.comments }}</text>
-							</view>
-							<view class="action-item" @tap="handleShare(post)">
-								<text class="icon">↗️</text>
-								<text class="count">{{ post.shares }}</text>
-							</view>
+					</view>
+					<!-- 互动区域 -->
+					<view class="interaction-bar">
+						<view class="action-item" @tap="handleLike(post)">
+							<image
+								class="action-icon"
+								:src="
+									post.isLiked
+										? '/static/icons/moments-share.png'
+										: '/static/icons/moments-like.png'
+								"
+								mode="aspectFit"
+							/>
+							<text class="count">{{ post.likes }}</text>
+						</view>
+						<view class="action-item" @tap="navigateToDetail(post.id)">
+							<image
+								class="action-icon"
+								src="/static/icons/moments-comments.png"
+								mode="aspectFit"
+							/>
+							<text class="count">{{ post.comments }}</text>
+						</view>
+						<view class="action-item" @tap="handleShare(post)">
+							<image
+								class="action-icon"
+								src="/static/icons/moments-share.png"
+								mode="aspectFit"
+							/>
+							<text class="count">{{ post.shares }}</text>
 						</view>
 					</view>
 				</view>
@@ -106,52 +121,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { momentApi } from "../../api/moments.js";
-
-// 模拟数据
-const mockPosts = [
-	{
-		id: 1,
-		username: "徐文",
-		avatar: "/static/avatar.jpg",
-		createTime: "2024年4月23日",
-		content: "享受失重，掌控自由！",
-		image: "/static/avatar.jpg",
-		isFollowed: false,
-		likes: 340,
-		comments: 340,
-		shares: 10,
-	},
-	{
-		id: 2,
-		username: "李星",
-		avatar: "/static/avatar.jpg",
-		createTime: "2024年4月23日",
-		content: "在水里，才自由！！！",
-		image: "",
-		isFollowed: true,
-		likes: 340,
-		comments: 340,
-		shares: 10,
-		sportData: {
-			distance: "275",
-			duration: "1:13:41",
-			pace: "26'47\"",
-			calories: "99",
-		},
-	},
-	{
-		id: 3,
-		username: "张教练",
-		avatar: "/static/avatar.jpg",
-		createTime: "2024年4月23日",
-		content: "今天的训练很充实，学员们都很给力！",
-		image: "/static/avatar.jpg",
-		isFollowed: false,
-		likes: 288,
-		comments: 120,
-		shares: 15,
-	},
-];
 
 // 状态定义
 const tabs = ["推荐", "关注", "我的"];
@@ -176,7 +145,7 @@ const fetchMoments = async (isRefresh = false) => {
 		};
 
 		const res = await momentApi.getMoments(params);
-
+		const currentUserId = JSON.parse(uni.getStorageSync("userInfo"))._id;
 		if (res.data.code === 200) {
 			// 处理返回的数据
 			const formattedPosts = res.data.data.items.map((item) => ({
@@ -187,7 +156,8 @@ const fetchMoments = async (isRefresh = false) => {
 				content: item.content,
 				image: item.images?.[0] || "",
 				images: item.images || [],
-				isFollowed: false, // 这个状态需要后端提供
+				isFollowed: false,
+				isLiked: item.likedBy?.includes(currentUserId), // 添加这个字段，需要后端返回当前用户是否点赞
 				likes: item.likeCount,
 				comments: item.commentCount,
 				shares: 0,
@@ -260,30 +230,27 @@ const handleFollow = (post) => {
 const handleLike = async (post) => {
 	try {
 		const res = await momentApi.likeMoment(post.id);
-		if (res.data.code === 200) {
-			post.likes += 1;
+		// 根据后端返回的 liked 状态更新点赞数
+		if (res.data.code === 201) {
+			// 假设成功响应的状态码是 200
+			const { liked } = res.data.data; // 从响应中获取点赞状态
+			post.likes += liked ? 1 : -1; // 根据状态更新点赞数
+
+			// 可选：更新点赞状态的视觉反馈
 			uni.showToast({
-				title: "点赞成功",
+				title: liked ? "点赞成功" : "取消点赞",
 				icon: "success",
 			});
 		} else {
-			throw new Error(res.data.message || "点赞失败");
+			throw new Error(res.data.message || "操作失败");
 		}
 	} catch (error) {
-		console.error("点赞失败:", error);
+		console.error("点赞操作失败:", error);
 		uni.showToast({
-			title: error.message || "点赞失败",
+			title: error.message || "操作失败",
 			icon: "none",
 		});
 	}
-};
-
-// 评论
-const handleComment = (post) => {
-	uni.showToast({
-		title: "评论功能开发中",
-		icon: "none",
-	});
 };
 
 // 分享
@@ -475,10 +442,11 @@ button::after {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		gap: 8rpx;
 
-		.icon {
-			font-size: 32rpx;
-			margin-right: 8rpx;
+		.action-icon {
+			width: 40rpx;
+			height: 40rpx;
 		}
 
 		.count {

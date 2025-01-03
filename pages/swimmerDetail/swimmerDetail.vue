@@ -36,15 +36,31 @@
 			<!-- 互动数据 -->
 			<view class="interaction-bar">
 				<view class="action-item" @tap="handleLike">
-					<text class="icon">❤️</text>
+					<image
+						class="action-icon"
+						:src="
+							post.isLiked
+								? '/static/icons/moments-share.png'
+								: '/static/icons/moments-like.png'
+						"
+						mode="aspectFit"
+					/>
 					<text class="count">{{ post.likes }}</text>
 				</view>
 				<view class="action-item">
-					<text class="icon">💬</text>
+					<image
+						class="action-icon"
+						src="/static/icons/moments-comments.png"
+						mode="aspectFit"
+					/>
 					<text class="count">{{ post.comments }}</text>
 				</view>
 				<view class="action-item" @tap="handleShare">
-					<text class="icon">↗️</text>
+					<image
+						class="action-icon"
+						src="/static/icons/moments-share.png"
+						mode="aspectFit"
+					/>
 					<text class="count">{{ post.shares }}</text>
 				</view>
 			</view>
@@ -144,6 +160,8 @@ const replyTo = ref(null);
 const fetchPostDetail = async (id) => {
 	try {
 		const res = await momentApi.getMomentDetail(id);
+		const currentUserId = JSON.parse(uni.getStorageSync("userInfo"))._id;
+
 		if (res.data.code === 200) {
 			// 处理返回的数据
 			const data = res.data.data;
@@ -156,6 +174,7 @@ const fetchPostDetail = async (id) => {
 				content: data.content,
 				images: data.images || [],
 				isFollowed: data.isFollowed,
+				isLiked: data.likedBy?.includes(currentUserId),
 				likes: data.likeCount,
 				comments: data.commentCount,
 				shares: data.shareCount || 0,
@@ -311,12 +330,28 @@ const handleFollow = () => {
 };
 
 // 点赞
-const handleLike = () => {
-	post.value.likes++;
-	uni.showToast({
-		title: "点赞成功",
-		icon: "success",
-	});
+const handleLike = async () => {
+	try {
+		const res = await momentApi.likeMoment(post.value.id);
+		if (res.data.code === 201) {
+			const { liked } = res.data.data;
+			post.value.likes += liked ? 1 : -1;
+			post.value.isLiked = liked;
+
+			uni.showToast({
+				title: liked ? "点赞成功" : "取消点赞",
+				icon: "success",
+			});
+		} else {
+			throw new Error(res.data.message || "操作失败");
+		}
+	} catch (error) {
+		console.error("点赞操作失败:", error);
+		uni.showToast({
+			title: error.message || "操作失败",
+			icon: "none",
+		});
+	}
 };
 
 // 分享
@@ -446,10 +481,16 @@ button::after {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		gap: 8rpx;
 
-		.icon {
-			font-size: 32rpx;
-			margin-right: 8rpx;
+		.action-icon {
+			width: 42rpx;
+			height: 42rpx;
+			transition: transform 0.2s ease;
+		}
+
+		.action-item:active .action-icon {
+			transform: scale(1.2);
 		}
 
 		.count {

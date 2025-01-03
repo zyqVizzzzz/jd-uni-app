@@ -23,9 +23,10 @@ const _sfc_main = {
           type: tabs[currentTab.value].toLowerCase()
         };
         const res = await api_moments.momentApi.getMoments(params);
+        const currentUserId = JSON.parse(common_vendor.index.getStorageSync("userInfo"))._id;
         if (res.data.code === 200) {
           const formattedPosts = res.data.data.items.map((item) => {
-            var _a, _b;
+            var _a, _b, _c;
             return {
               id: item._id,
               username: item.author.nickname,
@@ -35,11 +36,12 @@ const _sfc_main = {
               image: ((_a = item.images) == null ? void 0 : _a[0]) || "",
               images: item.images || [],
               isFollowed: false,
-              // 这个状态需要后端提供
+              isLiked: (_b = item.likedBy) == null ? void 0 : _b.includes(currentUserId),
+              // 添加这个字段，需要后端返回当前用户是否点赞
               likes: item.likeCount,
               comments: item.commentCount,
               shares: 0,
-              sportData: (_b = item.metadata) == null ? void 0 : _b.sportData
+              sportData: (_c = item.metadata) == null ? void 0 : _c.sportData
             };
           });
           if (isRefresh) {
@@ -97,28 +99,23 @@ const _sfc_main = {
     const handleLike = async (post) => {
       try {
         const res = await api_moments.momentApi.likeMoment(post.id);
-        if (res.data.code === 200) {
-          post.likes += 1;
+        if (res.data.code === 201) {
+          const { liked } = res.data.data;
+          post.likes += liked ? 1 : -1;
           common_vendor.index.showToast({
-            title: "点赞成功",
+            title: liked ? "点赞成功" : "取消点赞",
             icon: "success"
           });
         } else {
-          throw new Error(res.data.message || "点赞失败");
+          throw new Error(res.data.message || "操作失败");
         }
       } catch (error) {
-        console.error("点赞失败:", error);
+        console.error("点赞操作失败:", error);
         common_vendor.index.showToast({
-          title: error.message || "点赞失败",
+          title: error.message || "操作失败",
           icon: "none"
         });
       }
-    };
-    const handleComment = (post) => {
-      common_vendor.index.showToast({
-        title: "评论功能开发中",
-        icon: "none"
-      });
     };
     const handleShare = (post) => {
       common_vendor.index.showShareMenu({
@@ -175,14 +172,15 @@ const _sfc_main = {
             n: common_vendor.t(post.sportData.pace),
             o: common_vendor.t(post.sportData.calories)
           } : {}, {
-            p: common_vendor.t(post.likes),
-            q: common_vendor.o(($event) => handleLike(post), index),
-            r: common_vendor.t(post.comments),
-            s: common_vendor.o(($event) => handleComment(), index),
-            t: common_vendor.t(post.shares),
-            v: common_vendor.o(($event) => handleShare(), index),
-            w: common_vendor.o(($event) => navigateToDetail(post.id), index),
-            x: index
+            p: common_vendor.o(($event) => navigateToDetail(post.id), index),
+            q: post.isLiked ? "/static/icons/moments-share.png" : "/static/icons/moments-like.png",
+            r: common_vendor.t(post.likes),
+            s: common_vendor.o(($event) => handleLike(post), index),
+            t: common_vendor.t(post.comments),
+            v: common_vendor.o(($event) => navigateToDetail(post.id), index),
+            w: common_vendor.t(post.shares),
+            x: common_vendor.o(($event) => handleShare(), index),
+            y: index
           });
         }),
         c: loading.value
