@@ -102,6 +102,7 @@ const fetchTotalData = async () => {
 	}
 };
 
+
 // 初始化
 onMounted(() => {
 	fetchTotalData();

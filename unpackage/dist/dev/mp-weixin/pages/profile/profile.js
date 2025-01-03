@@ -33,12 +33,16 @@ const _sfc_main = {
     });
     const handleCityChange = (e) => {
       const [province, city, district] = e.detail.value;
+      const [provinceCode, cityCode, districtCode] = e.detail.code || [];
       const cityDisplay = city || province;
       updateUserInfo({
-        city: cityDisplay,
         province,
-        // 如果后端需要，可以保存完整的地址信息
-        district
+        city: cityDisplay,
+        district,
+        provinceCode: provinceCode == null ? void 0 : provinceCode.toString(),
+        // 转换为字符串存储
+        cityCode: cityCode == null ? void 0 : cityCode.toString(),
+        districtCode: districtCode == null ? void 0 : districtCode.toString()
       });
     };
     const getDate = (type) => {

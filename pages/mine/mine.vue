@@ -58,16 +58,51 @@
 
 			<!-- 设备内容 -->
 			<view class="device-content" v-if="activeTab === 'device'">
-				<image
-					src="/static/device.png"
-					class="device-image"
-					mode="aspectFit"
-					@tap="navigateToDevice"
-				/>
-				<view class="connection-status">
-					<view class="status-dot"></view>
-					<text class="status-text">已连接</text>
-				</view>
+				<swiper
+					class="device-swiper"
+					:indicator-dots="false"
+					:current="currentDevice"
+					@change="handleDeviceChange"
+				>
+					<swiper-item v-for="(device, index) in devicesList" :key="index">
+						<view class="device-item">
+							<image
+								src="/static/device.png"
+								class="device-image"
+								mode="aspectFit"
+							/>
+							<view class="device-info">
+								<text class="device-name">{{ device.device_name }}</text>
+								<view class="connection-status">
+									<view
+										class="status-dot"
+										:class="{
+											'status-online': device.device_status === 'online',
+										}"
+									></view>
+									<text class="status-text">
+										{{
+											device.device_status === "online" ? "已连接" : "未连接"
+										}}
+									</text>
+								</view>
+							</view>
+						</view>
+					</swiper-item>
+					<swiper-item>
+						<view class="device-item add-device" @tap="handleAddDevice">
+							<image
+								src="/static/device.png"
+								class="device-image"
+								mode="aspectFit"
+								@tap="navigateToDevice(device)"
+							/>
+							<view class="device-info">
+								<text class="device-name">添加新设备</text>
+							</view>
+						</view>
+					</swiper-item>
+				</swiper>
 			</view>
 
 			<!-- 勋章内容 -->
@@ -119,6 +154,12 @@ const userInfo = ref({
 	followers: 0,
 	points: 0,
 });
+const devicesList = ref([]);
+const currentDevice = ref(0);
+
+const handleDeviceChange = (e) => {
+	currentDevice.value = e.detail.current;
+};
 
 onMounted(() => {
 	// 先尝试从本地存储获取用户信息
@@ -132,6 +173,7 @@ onMounted(() => {
 	}
 	checkLoginStatus(() => {
 		fetchUserInfo();
+		fetchUserDevices();
 	});
 });
 
@@ -147,6 +189,7 @@ onShow(() => {
 	}
 	checkLoginStatus(() => {
 		fetchUserInfo();
+		fetchUserDevices();
 	});
 });
 
@@ -174,6 +217,24 @@ const fetchUserInfo = async () => {
 		console.error("获取用户信息失败:", error);
 		uni.showToast({
 			title: "获取用户信息失败",
+			icon: "none",
+		});
+	}
+};
+
+const fetchUserDevices = async () => {
+	const openid = JSON.parse(uni.getStorageSync("userInfo")).openid;
+	try {
+		const res = await request({
+			url: "/devices/user/" + openid,
+		});
+		if (res.data.code === 200) {
+			devicesList.value = res.data.data;
+		}
+	} catch (error) {
+		console.error("获取设备列表失败:", error);
+		uni.showToast({
+			title: "获取设备列表失败",
 			icon: "none",
 		});
 	}
@@ -356,6 +417,19 @@ view {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	width: 100%;
+}
+
+.device-swiper {
+	width: 100%;
+	height: 240rpx; /* 适配原有图片高度 */
+}
+
+.device-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20rpx 0;
 }
 
 .device-image {
@@ -363,11 +437,28 @@ view {
 	height: 128rpx;
 }
 
+.device-image {
+	width: 256rpx;
+	height: 128rpx;
+}
+
+.device-info {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.device-name {
+	font-size: 28rpx;
+	color: #333;
+	margin: 16rpx 0 8rpx;
+}
+
 .connection-status {
 	align-self: flex-end;
 	display: flex;
 	align-items: center;
-	margin-top: 16rpx;
 }
 
 .status-dot {
@@ -410,5 +501,24 @@ view {
 
 .arrow {
 	color: #cccccc;
+}
+
+.add-device {
+	opacity: 0.7;
+	transition: opacity 0.3s;
+}
+
+.add-device:active {
+	opacity: 1;
+}
+
+.add-device .device-image {
+	width: 128rpx; /* 可能需要调整大小 */
+	height: 128rpx;
+}
+
+.add-device .device-name {
+	color: #999;
+	margin-top: 0rpx;
 }
 </style>

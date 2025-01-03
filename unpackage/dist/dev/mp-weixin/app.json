@@ -4,6 +4,8 @@
     "pages/mine/mine",
     "pages/ranking/ranking",
     "pages/swimmer/swimmer",
+    "pages/swimmerDetail/swimmerDetail",
+    "pages/publish/publish",
     "pages/test/login",
     "pages/index/index",
     "pages/setting/setting",

@@ -149,13 +149,18 @@ const heightIndex = computed(() => {
 // 处理城市选择变化
 const handleCityChange = (e) => {
 	const [province, city, district] = e.detail.value;
+	const [provinceCode, cityCode, districtCode] = e.detail.code || [];
+
 	// 更新显示的城市信息（这里可以根据需求决定是否显示省份和区）
 	const cityDisplay = city || province; // 这里只显示市级名称，可以根据需求调整
 
 	updateUserInfo({
+		province,
 		city: cityDisplay,
-		province, // 如果后端需要，可以保存完整的地址信息
 		district,
+		provinceCode: provinceCode?.toString(), // 转换为字符串存储
+		cityCode: cityCode?.toString(),
+		districtCode: districtCode?.toString(),
 	});
 };
 

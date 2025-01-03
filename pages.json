@@ -29,6 +29,19 @@
 			}
 		},
 		{
+			"path": "pages/swimmerDetail/swimmerDetail",
+			"style": {
+				"navigationBarTitleText": "发布详情",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/publish/publish",
+			"style": {
+				"navigationBarTitleText": "发布动态"
+			}
+		},
+		{
 			"path": "pages/test/login",
 			"style": {
 				"navigationBarTitleText": "登录测试"

@@ -56,6 +56,22 @@ page {
 	background-color: #ffffff !important; /* 选中状态下点的颜色改为白色，以提高对比度 */
 }
 
+.uni-swiper-dots {
+	bottom: 0;
+}
+
+.uni-swiper-dot {
+	width: 16rpx;
+	height: 16rpx;
+	border-radius: 50%;
+	margin: 0 8rpx;
+	background-color: #ddd;
+}
+
+.uni-swiper-dot-active {
+	background-color: #ffc107;
+}
+
 /* #endif */
 .example-info {
 	font-size: 14px;

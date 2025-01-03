@@ -18,6 +18,11 @@ const _sfc_main = {
       followers: 0,
       points: 0
     });
+    const devicesList = common_vendor.ref([]);
+    const currentDevice = common_vendor.ref(0);
+    const handleDeviceChange = (e) => {
+      currentDevice.value = e.detail.current;
+    };
     common_vendor.onMounted(() => {
       const localUserInfo = common_vendor.index.getStorageSync("userInfo");
       if (localUserInfo) {
@@ -29,6 +34,7 @@ const _sfc_main = {
       }
       checkLoginStatus(() => {
         fetchUserInfo();
+        fetchUserDevices();
       });
     });
     common_vendor.onShow(() => {
@@ -42,6 +48,7 @@ const _sfc_main = {
       }
       checkLoginStatus(() => {
         fetchUserInfo();
+        fetchUserDevices();
       });
     });
     const checkLoginStatus = (cb) => {
@@ -65,6 +72,23 @@ const _sfc_main = {
         console.error("获取用户信息失败:", error);
         common_vendor.index.showToast({
           title: "获取用户信息失败",
+          icon: "none"
+        });
+      }
+    };
+    const fetchUserDevices = async () => {
+      const openid = JSON.parse(common_vendor.index.getStorageSync("userInfo")).openid;
+      try {
+        const res = await utils_require.request({
+          url: "/devices/user/" + openid
+        });
+        if (res.data.code === 200) {
+          devicesList.value = res.data.data;
+        }
+      } catch (error) {
+        console.error("获取设备列表失败:", error);
+        common_vendor.index.showToast({
+          title: "获取设备列表失败",
           icon: "none"
         });
       }
@@ -124,18 +148,29 @@ const _sfc_main = {
         m: common_vendor.o(($event) => handleTabClick("medal")),
         n: activeTab.value === "device"
       }, activeTab.value === "device" ? {
-        o: common_vendor.o(navigateToDevice)
+        o: common_vendor.f(devicesList.value, (device, index, i0) => {
+          return {
+            a: common_vendor.t(device.device_name),
+            b: device.device_status === "online" ? 1 : "",
+            c: common_vendor.t(device.device_status === "online" ? "已连接" : "未连接"),
+            d: index
+          };
+        }),
+        p: common_vendor.o(($event) => navigateToDevice(_ctx.device)),
+        q: common_vendor.o((...args) => _ctx.handleAddDevice && _ctx.handleAddDevice(...args)),
+        r: currentDevice.value,
+        s: common_vendor.o(handleDeviceChange)
       } : {}, {
-        p: activeTab.value === "medal"
+        t: activeTab.value === "medal"
       }, activeTab.value === "medal" ? {} : {}, {
-        q: common_vendor.o(navigateToMessage),
-        r: common_vendor.o(navigateToContact),
-        s: common_vendor.o(navigateToAccount),
-        t: common_vendor.sr(loginPopupRef, "093d7f73-0", {
+        v: common_vendor.o(navigateToMessage),
+        w: common_vendor.o(navigateToContact),
+        x: common_vendor.o(navigateToAccount),
+        y: common_vendor.sr(loginPopupRef, "093d7f73-0", {
           "k": "loginPopupRef"
         }),
-        v: common_vendor.o(handleLoginSuccess),
-        w: common_vendor.o(handleLoginClose)
+        z: common_vendor.o(handleLoginSuccess),
+        A: common_vendor.o(handleLoginClose)
       });
     };
   }

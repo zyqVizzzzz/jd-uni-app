@@ -6,6 +6,8 @@ if (!Math) {
   "./pages/mine/mine.js";
   "./pages/ranking/ranking.js";
   "./pages/swimmer/swimmer.js";
+  "./pages/swimmerDetail/swimmerDetail.js";
+  "./pages/publish/publish.js";
   "./pages/test/login.js";
   "./pages/index/index.js";
   "./pages/setting/setting.js";
