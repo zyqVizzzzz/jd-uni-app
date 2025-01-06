@@ -106,6 +106,10 @@ export default {
 				title: "设置已保存",
 				icon: "success",
 			});
+
+			uni.switchTab({
+				url: "/pages/mine/mine",
+			});
 		};
 
 		return {

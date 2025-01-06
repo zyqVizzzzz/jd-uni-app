@@ -22,15 +22,38 @@
 </template>
 
 <script setup>
-	import { ref, reactive } from "vue";
-	const selectedGender = ref(null);
-	
-	const selectGender = (gender) => {
-		console.log(gender);
-		uni.navigateTo({
-		  url: "/pages/profileEditBirth/profileEditBirth",
+import { ref, reactive } from "vue";
+import { request } from "@/utils/require";
+const selectedGender = ref(null);
+
+// 更新用户信息
+const updateUserInfo = async (data) => {
+	try {
+		const res = await request({
+			url: "/users/me",
+			method: "POST",
+			data,
+		});
+		if (res.data.code === 201) {
+			uni.navigateTo({
+				url: "/pages/profileEditBirth/profileEditBirth",
+			});
+		}
+	} catch (error) {
+		uni.showToast({
+			title: "更新失败",
+			icon: "none",
 		});
 	}
+};
+
+const selectGender = (gender) => {
+	console.log(gender);
+	const genderObj = { male: 1, female: 2 };
+	updateUserInfo({
+		gender: parseInt(genderObj[gender]),
+	});
+};
 </script>
 
 <style scoped>

@@ -106,6 +106,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { request } from "@/utils/require";
+import config from "@/config";
 
 const userInfo = ref({});
 
@@ -211,6 +212,7 @@ const fetchUserInfo = async () => {
 			const userData = res.data.data;
 			userInfo.value = userData;
 			uni.setStorageSync("userInfo", JSON.stringify(userData));
+			console.log(userInfo.value);
 		}
 	} catch (error) {
 		console.error("获取用户信息失败:", error);
@@ -287,7 +289,7 @@ const uploadAvatar = async (filePath) => {
 		});
 
 		const uploadRes = await uni.uploadFile({
-			url: "http://localhost:3000/users/me/avatar",
+			url: `${config.API_BASE_URL}/users/me/avatar`,
 			filePath: filePath,
 			name: "avatar",
 			header: {
@@ -297,7 +299,8 @@ const uploadAvatar = async (filePath) => {
 
 		uni.hideLoading();
 
-		if (uploadRes.data.code === 200 || uploadRes.data.code === 201) {
+		// 小程序默认会把 res 返回成字符串，而不是对象，这里需要优化
+		if (uploadRes.data.includes("201")) {
 			uni.showToast({
 				title: "上传成功",
 				icon: "success",

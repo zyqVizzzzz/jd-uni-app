@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
 const utils_require = require("../utils/require.js");
+const config = require("../config.js");
 const momentApi = {
   // 获取动态列表
   getMoments: (params) => {
@@ -29,7 +30,7 @@ const momentApi = {
     return new Promise((resolve, reject) => {
       const token = common_vendor.index.getStorageSync("token");
       common_vendor.index.uploadFile({
-        url: "http://localhost:3000/moments/upload",
+        url: `${config.config.API_BASE_URL}/moments/upload`,
         files: filePaths.map((path) => ({
           name: "images",
           uri: path

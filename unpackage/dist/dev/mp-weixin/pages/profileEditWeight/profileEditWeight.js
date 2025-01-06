@@ -1,5 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_require = require("../../utils/require.js");
+require("../../config.js");
 if (!Math) {
   WeightScale();
 }
@@ -12,9 +14,28 @@ const _sfc_main = {
       common_vendor.index.navigateBack();
     };
     const goNext = () => {
-      common_vendor.index.navigateTo({
-        url: "/pages/profileEditHeight/profileEditHeight"
+      updateUserInfo({
+        weight: parseInt(weight.value)
       });
+    };
+    const updateUserInfo = async (data) => {
+      try {
+        const res = await utils_require.request({
+          url: "/users/me",
+          method: "POST",
+          data
+        });
+        if (res.data.code === 201) {
+          common_vendor.index.navigateTo({
+            url: "/pages/profileEditHeight/profileEditHeight"
+          });
+        }
+      } catch (error) {
+        common_vendor.index.showToast({
+          title: "更新失败",
+          icon: "none"
+        });
+      }
     };
     const handleWeightChange = (value) => {
       weight.value = value;

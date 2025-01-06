@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_require = require("../../utils/require.js");
+require("../../config.js");
 const _sfc_main = {
   __name: "points",
   setup(__props) {

@@ -3,6 +3,6 @@
   "projectname": "jd-uni-app",
   "setting": {
     "compileHotReLoad": true,
-    "urlCheck": false
+    "bigPackageSizeSupport": true
   }
 }

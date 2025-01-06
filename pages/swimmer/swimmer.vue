@@ -188,10 +188,6 @@ const onRefresh = async () => {
 	isRefreshing.value = true;
 	try {
 		await fetchMoments(true);
-		uni.showToast({
-			title: "刷新成功",
-			icon: "success",
-		});
 	} catch (error) {
 		console.error("刷新失败:", error);
 	} finally {

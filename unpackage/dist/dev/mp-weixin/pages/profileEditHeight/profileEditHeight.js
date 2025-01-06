@@ -1,5 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_require = require("../../utils/require.js");
+require("../../config.js");
 if (!Math) {
   ScrollPicker();
 }
@@ -11,77 +13,60 @@ const _sfc_main = {
       common_vendor.index.navigateBack();
     };
     const goNext = () => {
-      common_vendor.index.navigateTo({
-        url: "/pages/profileEditTarget/profileEditTarget"
+      var _a;
+      const selectedHeight = (_a = heightColumns[0].options.find(
+        (opt) => opt.value === heightColumns[0].defaultValue
+      )) == null ? void 0 : _a.value;
+      updateUserInfo({
+        height: parseInt(selectedHeight)
       });
     };
-    const generateYearOptions = (startYear, endYear) => {
+    const updateUserInfo = async (data) => {
+      try {
+        const res = await utils_require.request({
+          url: "/users/me",
+          method: "POST",
+          data
+        });
+        if (res.data.code === 201) {
+          common_vendor.index.navigateTo({
+            url: "/pages/profileEditTarget/profileEditTarget"
+          });
+        }
+      } catch (error) {
+        common_vendor.index.showToast({
+          title: "更新失败",
+          icon: "none"
+        });
+      }
+    };
+    const generateHeightOptions = (minHeight, maxHeight) => {
       const options = [];
-      for (let year = startYear; year <= endYear; year++) {
+      for (let height = minHeight; height <= maxHeight; height++) {
         options.push({
-          label: year,
-          value: year.toString()
+          label: height.toString(),
+          value: height.toString()
         });
       }
       return options;
     };
-    const generateMonthOptions = () => {
-      const options = [];
-      for (let month = 1; month <= 12; month++) {
-        const value = month.toString().padStart(2, "0");
-        options.push({
-          label: value,
-          value
-        });
-      }
-      return options;
-    };
-    const generateDayOptions = (year, month) => {
-      const days = new Date(year, month, 0).getDate();
-      const options = [];
-      for (let day = 1; day <= days; day++) {
-        const value = day.toString().padStart(2, "0");
-        options.push({
-          label: value,
-          value
-        });
-      }
-      return options;
-    };
-    const dateColumns = common_vendor.reactive([
+    const heightColumns = common_vendor.reactive([
       {
-        options: generateYearOptions(1989, 1995),
-        defaultValue: "1992"
-      },
-      {
-        options: generateMonthOptions(),
-        defaultValue: "05"
-      },
-      {
-        options: generateDayOptions(1992, 5),
-        defaultValue: "05"
+        options: generateHeightOptions(50, 250),
+        defaultValue: "170"
       }
     ]);
-    const handleDateChange = (e) => {
-      var _a, _b;
-      const { values, columnIndex } = e;
-      if (columnIndex === 0 || columnIndex === 1) {
-        const year = ((_a = values[0]) == null ? void 0 : _a.value) || dateColumns[0].defaultValue;
-        const month = ((_b = values[1]) == null ? void 0 : _b.value) || dateColumns[1].defaultValue;
-        dateColumns[2].options = generateDayOptions(
-          parseInt(year),
-          parseInt(month)
-        );
+    const handleHeightChange = (e) => {
+      const { values } = e;
+      if (values[0]) {
+        heightColumns[0].defaultValue = values[0].value;
       }
     };
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.o(handleDateChange),
+        a: common_vendor.o(handleHeightChange),
         b: common_vendor.p({
-          columns: [{
-            options: generateYearOptions(1989, 1995),
-            defaultValue: "1992"
-          }],
+          columns: heightColumns,
           title: "您的身高(CM)"
         }),
         c: common_vendor.o(goPrevious),

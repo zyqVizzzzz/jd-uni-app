@@ -65,7 +65,8 @@ const _sfc_main = {
             a: common_vendor.f(column.options, (item, index, i1) => {
               return {
                 a: common_vendor.t(item.label),
-                b: index
+                b: index === currentIndex.value[columnIndex] ? 1 : "",
+                c: index
               };
             }),
             b: columnIndex

@@ -14,6 +14,16 @@ const _sfc_main = {
         }
       }
     });
+    common_vendor.onShow(() => {
+      const localUserInfo = common_vendor.index.getStorageSync("userInfo");
+      if (localUserInfo) {
+        try {
+          userInfo.value = JSON.parse(localUserInfo);
+        } catch (e) {
+          console.error("解析本地用户信息失败:", e);
+        }
+      }
+    });
     const navigateToProfile = () => {
       common_vendor.index.navigateTo({
         url: "/pages/profile/profile"

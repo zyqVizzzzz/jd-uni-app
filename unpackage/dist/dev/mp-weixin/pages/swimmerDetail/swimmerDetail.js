@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const api_moments = require("../../api/moments.js");
 const api_comments = require("../../api/comments.js");
 require("../../utils/require.js");
+require("../../config.js");
 const _sfc_main = {
   __name: "swimmerDetail",
   setup(__props) {

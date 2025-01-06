@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_moments = require("../../api/moments.js");
+const config = require("../../config.js");
 require("../../utils/require.js");
 const _sfc_main = {
   __name: "publish",
@@ -39,7 +40,7 @@ const _sfc_main = {
             for (const image of images.value) {
               const res2 = await new Promise((resolve, reject) => {
                 common_vendor.index.uploadFile({
-                  url: "http://localhost:3000/moments/upload",
+                  url: `${config.config.API_BASE_URL}/moments/upload`,
                   filePath: image,
                   name: "images",
                   header: {

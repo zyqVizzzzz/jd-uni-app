@@ -26,11 +26,13 @@
   justify-content: center;
   align-items: center;
   height: 66px;
-  font-size: 43px;
-  color: #333;
+  font-size: 32px;
+  color: #999;
+  transition: all 0.3s;
 }
 .scroll-picker .picker-item.selected {
-  color: #000;
+  font-size: 43px;
+  color: #333;
   font-weight: bold;
 }
 .scroll-picker .picker-mask {
@@ -61,9 +63,25 @@
 }
 .scroll-picker .picker-indicator::before {
   top: 0;
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110%;
+  height: 6rpx;
+  background-color: #ffd700;
+  border-radius: 3rpx;
 }
 .scroll-picker .picker-indicator::after {
+  content: "";
+  position: absolute;
   bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 110%;
+  height: 6rpx;
+  background-color: #ffd700;
+  border-radius: 3rpx;
 }
  .uni-picker-view-indicator {
   height: 88rpx !important;

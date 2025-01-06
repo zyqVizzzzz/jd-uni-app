@@ -26,6 +26,9 @@ const _sfc_main = {
         title: "设置已保存",
         icon: "success"
       });
+      common_vendor.index.switchTab({
+        url: "/pages/mine/mine"
+      });
     };
     return {
       distanceAlert,

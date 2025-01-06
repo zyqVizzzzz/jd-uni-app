@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_require = require("../../utils/require.js");
+const config = require("../../config.js");
 const _sfc_main = {
   __name: "profile",
   setup(__props) {
@@ -78,6 +79,7 @@ const _sfc_main = {
           const userData = res.data.data;
           userInfo.value = userData;
           common_vendor.index.setStorageSync("userInfo", JSON.stringify(userData));
+          console.log(userInfo.value);
         }
       } catch (error) {
         console.error("获取用户信息失败:", error);
@@ -144,7 +146,7 @@ const _sfc_main = {
           title: "上传中..."
         });
         const uploadRes = await common_vendor.index.uploadFile({
-          url: "http://localhost:3000/users/me/avatar",
+          url: `${config.config.API_BASE_URL}/users/me/avatar`,
           filePath,
           name: "avatar",
           header: {
@@ -152,7 +154,7 @@ const _sfc_main = {
           }
         });
         common_vendor.index.hideLoading();
-        if (uploadRes.data.code === 200 || uploadRes.data.code === 201) {
+        if (uploadRes.data.includes("201")) {
           common_vendor.index.showToast({
             title: "上传成功",
             icon: "success"

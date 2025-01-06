@@ -15,25 +15,49 @@
   margin: 60rpx auto 120rpx;
 }
 .navigation-buttons.data-v-e16614c4 {
-  margin-top: 40px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 16px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  background-color: #fff;
 }
-button.data-v-e16614c4 {
-  padding: 10px 20px;
-  font-size: 16px;
+.navigation-buttons .back-btn.data-v-e16614c4 {
+  background: #f0f2f5;
+  width: 108rpx;
+  height: 108rpx;
+  border-radius: 108rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.navigation-buttons .back-btn .back-arrow.data-v-e16614c4 {
+  font-size: 24px;
+  color: #333;
+}
+.navigation-buttons .next-btn.data-v-e16614c4 {
+  background-color: #ffd700;
+  color: #000;
+  font-size: 18px;
+  font-weight: 500;
+  width: 252rpx;
+  height: 108rpx;
+  border-radius: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  border-radius: 4px;
-  background-color: #ffc107;
-  color: #fff;
-  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0;
 }
-button.data-v-e16614c4:active {
-  background-color: #e0a800;
+.navigation-buttons .next-btn.data-v-e16614c4::after {
+  border: none;
 }
-.note.data-v-e16614c4 {
-  margin-top: 20px;
-  text-align: center;
-  color: #666;
-  font-size: 14px;
+.navigation-buttons .next-btn.data-v-e16614c4:active {
+  opacity: 0.8;
 }

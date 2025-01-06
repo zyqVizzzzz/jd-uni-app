@@ -1,13 +1,35 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_require = require("../../utils/require.js");
+require("../../config.js");
 const _sfc_main = {
   __name: "profileEditGender",
   setup(__props) {
     const selectedGender = common_vendor.ref(null);
+    const updateUserInfo = async (data) => {
+      try {
+        const res = await utils_require.request({
+          url: "/users/me",
+          method: "POST",
+          data
+        });
+        if (res.data.code === 201) {
+          common_vendor.index.navigateTo({
+            url: "/pages/profileEditBirth/profileEditBirth"
+          });
+        }
+      } catch (error) {
+        common_vendor.index.showToast({
+          title: "更新失败",
+          icon: "none"
+        });
+      }
+    };
     const selectGender = (gender) => {
       console.log(gender);
-      common_vendor.index.navigateTo({
-        url: "/pages/profileEditBirth/profileEditBirth"
+      const genderObj = { male: 1, female: 2 };
+      updateUserInfo({
+        gender: parseInt(genderObj[gender])
       });
     };
     return (_ctx, _cache) => {

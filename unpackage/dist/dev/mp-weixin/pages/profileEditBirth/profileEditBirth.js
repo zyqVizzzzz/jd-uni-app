@@ -1,5 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_require = require("../../utils/require.js");
+require("../../config.js");
 if (!Math) {
   ScrollPicker();
 }
@@ -11,9 +13,47 @@ const _sfc_main = {
       common_vendor.index.navigateBack();
     };
     const goNext = () => {
-      common_vendor.index.navigateTo({
-        url: "/pages/profileEditWeight/profileEditWeight"
+      var _a, _b, _c;
+      const selectedYear = (_a = dateColumns[0].options.find(
+        (opt) => opt.value === dateColumns[0].defaultValue
+      )) == null ? void 0 : _a.value;
+      const selectedMonth = (_b = dateColumns[1].options.find(
+        (opt) => opt.value === dateColumns[1].defaultValue
+      )) == null ? void 0 : _b.value;
+      const selectedDay = (_c = dateColumns[2].options.find(
+        (opt) => opt.value === dateColumns[2].defaultValue
+      )) == null ? void 0 : _c.value;
+      console.log(selectedDay, selectedMonth, selectedYear);
+      updateUserInfo({
+        birthday: {
+          year: selectedYear,
+          month: selectedMonth,
+          day: selectedDay
+        }
       });
+    };
+    const updateUserInfo = async (data) => {
+      try {
+        if (data.birthday) {
+          const { year, month, day } = data.birthday;
+          data.birthday = `${year}-${month}-${day}`;
+        }
+        const res = await utils_require.request({
+          url: "/users/me",
+          method: "POST",
+          data
+        });
+        if (res.data.code === 201) {
+          common_vendor.index.navigateTo({
+            url: "/pages/profileEditWeight/profileEditWeight"
+          });
+        }
+      } catch (error) {
+        common_vendor.index.showToast({
+          title: "更新失败",
+          icon: "none"
+        });
+      }
     };
     const generateYearOptions = (startYear, endYear) => {
       const options = [];
@@ -50,15 +90,15 @@ const _sfc_main = {
     };
     const dateColumns = common_vendor.reactive([
       {
-        options: generateYearOptions(1989, 1995),
-        defaultValue: "1992"
+        options: generateYearOptions(1900, 2024),
+        defaultValue: "2000"
       },
       {
         options: generateMonthOptions(),
         defaultValue: "05"
       },
       {
-        options: generateDayOptions(1992, 5),
+        options: generateDayOptions(2e3, 5),
         defaultValue: "05"
       }
     ]);
@@ -73,21 +113,18 @@ const _sfc_main = {
           parseInt(month)
         );
       }
+      if (values[0])
+        dateColumns[0].defaultValue = values[0].value;
+      if (values[1])
+        dateColumns[1].defaultValue = values[1].value;
+      if (values[2])
+        dateColumns[2].defaultValue = values[2].value;
     };
     return (_ctx, _cache) => {
       return {
         a: common_vendor.o(handleDateChange),
         b: common_vendor.p({
-          columns: [{
-            options: generateYearOptions(1989, 1995),
-            defaultValue: "1992"
-          }, {
-            options: generateMonthOptions(),
-            defaultValue: "05"
-          }, {
-            options: generateDayOptions(1992, 5),
-            defaultValue: "05"
-          }],
+          columns: dateColumns,
           title: "您的生日"
         }),
         c: common_vendor.o(goPrevious),

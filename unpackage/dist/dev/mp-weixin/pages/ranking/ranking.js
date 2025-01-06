@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_require = require("../../utils/require.js");
+require("../../config.js");
 if (!Array) {
   const _easycom_uni_popup2 = common_vendor.resolveComponent("uni-popup");
   _easycom_uni_popup2();
@@ -31,31 +32,6 @@ const _sfc_main = {
       }
       return topThree.value;
     });
-    const handleLocationClick = async () => {
-      if (!isSelectingCity.value) {
-        selectLocation("local");
-        isSelectingCity.value = true;
-      } else {
-        await openCitySelector();
-      }
-    };
-    const openCitySelector = async () => {
-      try {
-        const res = await utils_require.request({
-          url: "/rankings/cities"
-        });
-        if (res.data.code === 200) {
-          cities.value = res.data.data;
-          cityPopup.value.open();
-        }
-      } catch (error) {
-        console.error("获取城市列表失败:", error);
-        common_vendor.index.showToast({
-          title: "获取城市列表失败",
-          icon: "none"
-        });
-      }
-    };
     const selectCity = (cityData) => {
       currentCity.value = cityData.city;
       selectedCityCode.value = cityData.cityCode;
@@ -65,14 +41,6 @@ const _sfc_main = {
     const closeCityPopup = () => {
       cityPopup.value.close();
       isSelectingCity.value = false;
-    };
-    const selectLocation = (type) => {
-      if (type === "national") {
-        isSelectingCity.value = false;
-        selectedCityCode.value = "";
-      }
-      selectedLocation.value = type;
-      fetchRankings(activeTab.value);
     };
     const generateTest = async () => {
       await utils_require.request({
@@ -184,13 +152,8 @@ const _sfc_main = {
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.o(generateTest),
-        b: selectedLocation.value === "national" ? 1 : "",
-        c: common_vendor.o(($event) => selectLocation("national")),
-        d: common_vendor.t(currentCity.value),
-        e: selectedLocation.value === "local" ? 1 : "",
-        f: common_vendor.o(handleLocationClick),
-        g: common_vendor.o(closeCityPopup),
-        h: common_vendor.f(cities.value, (city, k0, i0) => {
+        b: common_vendor.o(closeCityPopup),
+        c: common_vendor.f(cities.value, (city, k0, i0) => {
           return {
             a: common_vendor.t(city.city),
             b: common_vendor.t(city.userCount),
@@ -198,20 +161,20 @@ const _sfc_main = {
             d: common_vendor.o(($event) => selectCity(city), city.cityCode)
           };
         }),
-        i: common_vendor.sr(cityPopup, "25b49241-0", {
+        d: common_vendor.sr(cityPopup, "25b49241-0", {
           "k": "cityPopup"
         }),
-        j: common_vendor.p({
+        e: common_vendor.p({
           type: "center",
           ["background-color"]: "#fff"
         }),
-        k: activeTab.value === "day" ? 1 : "",
-        l: common_vendor.o(($event) => selectTab("day")),
-        m: activeTab.value === "month" ? 1 : "",
-        n: common_vendor.o(($event) => selectTab("month")),
-        o: activeTab.value === "year" ? 1 : "",
-        p: common_vendor.o(($event) => selectTab("year")),
-        q: common_vendor.f(displayTopThree.value, (user, index, i0) => {
+        f: activeTab.value === "day" ? 1 : "",
+        g: common_vendor.o(($event) => selectTab("day")),
+        h: activeTab.value === "month" ? 1 : "",
+        i: common_vendor.o(($event) => selectTab("month")),
+        j: activeTab.value === "year" ? 1 : "",
+        k: common_vendor.o(($event) => selectTab("year")),
+        l: common_vendor.f(displayTopThree.value, (user, index, i0) => {
           return common_vendor.e({
             a: user
           }, user ? {
@@ -226,9 +189,9 @@ const _sfc_main = {
             h: index
           });
         }),
-        r: rankingList.value.length > 0
+        m: rankingList.value.length > 0
       }, rankingList.value.length > 0 ? {
-        s: common_vendor.f(rankingList.value, (item, k0, i0) => {
+        n: common_vendor.f(rankingList.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.rank),
             b: common_vendor.t(item.name),
@@ -237,9 +200,9 @@ const _sfc_main = {
           };
         })
       } : {}, {
-        t: common_vendor.t(currentUserRank.value.rank),
-        v: common_vendor.t(currentUserRank.value.name),
-        w: common_vendor.t(currentUserRank.value.distance)
+        o: common_vendor.t(currentUserRank.value.rank),
+        p: common_vendor.t(currentUserRank.value.name),
+        q: common_vendor.t(currentUserRank.value.distance)
       });
     };
   }

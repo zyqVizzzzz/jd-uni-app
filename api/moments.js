@@ -1,5 +1,6 @@
 // api/moments.js
 import { request } from "@/utils/require";
+import config from "@/config";
 
 // 动态相关的 API
 export const momentApi = {
@@ -34,7 +35,7 @@ export const momentApi = {
 			const token = uni.getStorageSync("token");
 
 			uni.uploadFile({
-				url: "http://localhost:3000/moments/upload",
+				url: `${config.API_BASE_URL}/moments/upload`,
 				files: filePaths.map((path) => ({
 					name: "images",
 					uri: path,

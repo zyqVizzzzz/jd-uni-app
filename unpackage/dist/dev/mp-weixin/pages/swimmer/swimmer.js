@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_moments = require("../../api/moments.js");
 require("../../utils/require.js");
+require("../../config.js");
 const pageSize = 20;
 const _sfc_main = {
   __name: "swimmer",
@@ -65,10 +66,6 @@ const _sfc_main = {
       isRefreshing.value = true;
       try {
         await fetchMoments(true);
-        common_vendor.index.showToast({
-          title: "刷新成功",
-          icon: "success"
-        });
       } catch (error) {
         console.error("刷新失败:", error);
       } finally {

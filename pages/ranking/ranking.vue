@@ -4,7 +4,7 @@
 		<view class="header">
 			<text class="rules" @tap="generateTest">评选规则</text>
 			<view class="location-toggle">
-				<view
+				<!-- <view
 					class="toggle-item"
 					:class="{ active: selectedLocation === 'national' }"
 					@tap="selectLocation('national')"
@@ -18,7 +18,7 @@
 				>
 					{{ currentCity }}
 					<text class="arrow">▼</text>
-				</view>
+				</view> -->
 			</view>
 		</view>
 

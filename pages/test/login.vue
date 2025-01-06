@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import config from "@/config";
 
 const loading = ref(false);
 const isLoggedIn = ref(false);
@@ -37,7 +38,7 @@ const token = ref("");
 const userInfo = ref(null);
 
 // 配置后端接口地址
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = config.API_BASE_URL;
 
 // 登录方法
 const handleLogin = async () => {

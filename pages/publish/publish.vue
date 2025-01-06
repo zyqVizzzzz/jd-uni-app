@@ -38,6 +38,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { momentApi } from "@/api/moments";
+import config from "@/config";
 
 const content = ref("");
 const images = ref([]);
@@ -81,7 +82,7 @@ const submitPost = async () => {
 				for (const image of images.value) {
 					const res = await new Promise((resolve, reject) => {
 						uni.uploadFile({
-							url: "http://localhost:3000/moments/upload",
+							url: `${config.API_BASE_URL}/moments/upload`,
 							filePath: image,
 							name: "images",
 							header: {

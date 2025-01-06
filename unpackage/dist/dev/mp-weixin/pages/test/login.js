@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const API_BASE_URL = "http://localhost:3000";
+const config = require("../../config.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "login",
   setup(__props) {
@@ -8,6 +8,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isLoggedIn = common_vendor.ref(false);
     const token = common_vendor.ref("");
     const userInfo = common_vendor.ref(null);
+    const API_BASE_URL = config.config.API_BASE_URL;
     const handleLogin = async () => {
       try {
         loading.value = true;

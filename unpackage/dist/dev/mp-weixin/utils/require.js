@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const BASE_URL = "http://localhost:3000";
+const config = require("../config.js");
+const BASE_URL = config.config.API_BASE_URL;
 const request = async (options) => {
   const { url, method = "GET", data, header = {} } = options;
   const token = common_vendor.index.getStorageSync("token");

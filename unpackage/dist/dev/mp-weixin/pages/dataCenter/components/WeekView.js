@@ -2,6 +2,7 @@
 const common_vendor = require("../../../common/vendor.js");
 const utils_require = require("../../../utils/require.js");
 const pages_dataCenter_components_format = require("./format.js");
+require("../../../config.js");
 if (!Array) {
   const _easycom_uni_calendar2 = common_vendor.resolveComponent("uni-calendar");
   _easycom_uni_calendar2();

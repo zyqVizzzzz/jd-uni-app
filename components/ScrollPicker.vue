@@ -15,6 +15,9 @@
 					<view
 						class="picker-item"
 						v-for="(item, index) in column.options"
+						:class="{
+							selected: index === currentIndex[columnIndex],
+						}"
 						:key="index"
 					>
 						{{ item.label }}
@@ -123,11 +126,13 @@ const onChange = (e) => {
 		justify-content: center;
 		align-items: center;
 		height: 66px;
-		font-size: 43px;
-		color: #333;
+		font-size: 32px; // 默认字体小一些
+		color: #999; // 未选中时使用灰色
+		transition: all 0.3s;
 
 		&.selected {
-			color: #000;
+			font-size: 43px; // 选中时字体变大
+			color: #333; // 选中时颜色加深
 			font-weight: bold;
 		}
 	}
@@ -174,10 +179,27 @@ const onChange = (e) => {
 
 		&::before {
 			top: 0;
+			content: "";
+			position: absolute;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 110%; // 下划线宽度
+			height: 6rpx; // 下划线厚度
+			background-color: #ffd700; // 黄色下划线
+			border-radius: 3rpx;
 		}
 
+		// 添加黄色下划线
 		&::after {
+			content: "";
+			position: absolute;
 			bottom: 0;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 110%; // 下划线宽度
+			height: 6rpx; // 下划线厚度
+			background-color: #ffd700; // 黄色下划线
+			border-radius: 3rpx;
 		}
 	}
 }
