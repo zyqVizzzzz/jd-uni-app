@@ -71,7 +71,7 @@
   margin-top: 10px;
 }
 .finding-device-page .action.contact .find-device-button {
-  background-color: #C0C4CC;
+  background-color: #c0c4cc;
   color: #606266;
   padding: 20rpx 20px;
   margin: 0 20px;

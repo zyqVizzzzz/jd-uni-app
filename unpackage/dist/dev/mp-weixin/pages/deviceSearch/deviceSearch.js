@@ -1,64 +1,136 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const utils_require = require("../../utils/require.js");
+require("../../config.js");
 const _sfc_main = {
   __name: "deviceSearch",
   setup(__props) {
     const foundDevices = common_vendor.ref([]);
-    let intervalId = null;
-    const status = common_vendor.ref("");
+    const status = common_vendor.ref("searching");
     const isRetry = common_vendor.ref(false);
-    common_vendor.onMounted(() => {
-      simulateBluetoothScan();
-    });
-    common_vendor.onUnmounted(() => {
-      if (intervalId)
-        clearInterval(intervalId);
-    });
-    function handleRetry() {
-      isRetry.value = true;
-      foundDevices.value = [];
-      simulateBluetoothScan();
-    }
-    function simulateBluetoothScan() {
-      let count = 0;
-      intervalId = setInterval(() => {
-        count++;
-        foundDevices.value.push({
-          name: `已发现设备_${count}`
-        });
-        if (count === 10) {
-          status.value = "pending";
-          clearInterval(intervalId);
+    const initBluetooth = () => {
+      common_vendor.index.openBluetoothAdapter({
+        success: (res) => {
+          console.log("蓝牙初始化成功", res);
+          startBluetoothDevicesDiscovery();
+        },
+        fail: (err) => {
+          console.error("蓝牙初始化失败", err);
+          status.value = "failed";
+          common_vendor.index.showToast({
+            title: "请开启蓝牙",
+            icon: "none"
+          });
         }
-      }, 100);
-    }
-    function contactSupport() {
-      console.log("联系客服");
-      common_vendor.index.navigateTo({
-        url: "/pages/contactCostumer/contactCostumer"
       });
-    }
-    const handleBind = (device) => {
-      simulateBindDevice().then(() => {
-        console.log(`绑定成功: ${device.name}`);
+    };
+    const startBluetoothDevicesDiscovery = () => {
+      common_vendor.index.startBluetoothDevicesDiscovery({
+        allowDuplicatesKey: false,
+        success: (res) => {
+          console.log("开始搜索蓝牙设备", res);
+          onBluetoothDeviceFound();
+        },
+        fail: (err) => {
+          console.error("搜索蓝牙设备失败", err);
+          status.value = "failed";
+        }
+      });
+    };
+    const onBluetoothDeviceFound = () => {
+      common_vendor.index.onBluetoothDeviceFound((res) => {
+        res.devices.forEach((device) => {
+          if (device.name && !foundDevices.value.some((d) => d.deviceId === device.deviceId)) {
+            foundDevices.value.push({
+              name: device.name,
+              deviceId: device.deviceId,
+              RSSI: device.RSSI,
+              advertisData: device.advertisData
+            });
+          }
+        });
+      });
+    };
+    const stopBluetoothDevicesDiscovery = () => {
+      common_vendor.index.stopBluetoothDevicesDiscovery({
+        success: (res) => {
+          console.log("停止搜索蓝牙设备", res);
+        }
+      });
+    };
+    const handleBind = async (device) => {
+      try {
+        stopBluetoothDevicesDiscovery();
+        await connectBluetoothDevice(device);
+        await saveDeviceToServer(device);
         status.value = "success";
+        common_vendor.index.showToast({
+          title: "绑定成功",
+          icon: "success"
+        });
         common_vendor.index.navigateTo({
           url: "/pages/deviceBindSuccess/deviceBindSuccess"
         });
-      }).catch(() => {
-        console.log(`绑定失败: ${device.name}`);
+      } catch (error) {
+        console.error("绑定失败", error);
         status.value = "failed";
-      });
+        common_vendor.index.showToast({
+          title: "绑定失败",
+          icon: "error"
+        });
+      }
     };
-    const simulateBindDevice = (device) => {
+    const connectBluetoothDevice = (device) => {
       return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          {
-            resolve();
+        common_vendor.index.createBLEConnection({
+          deviceId: device.deviceId,
+          timeout: 1e4,
+          // 超时时间10秒
+          success: (res) => {
+            console.log("连接蓝牙设备成功", res);
+            resolve(res);
+          },
+          fail: (err) => {
+            console.error("连接蓝牙设备失败", err);
+            reject(err);
           }
-        }, 1e3);
+        });
       });
     };
+    const saveDeviceToServer = async (device) => {
+      try {
+        const res = await utils_require.request({
+          url: "/devices",
+          method: "POST",
+          data: {
+            device_model: device.deviceId,
+            device_name: device.name
+          }
+        });
+        return res.data.code === 200 || res.data.code === 201;
+      } catch (error) {
+        console.error("保存设备信息到服务器失败", error);
+        throw error;
+      }
+    };
+    const handleRetry = () => {
+      isRetry.value = true;
+      foundDevices.value = [];
+      status.value = "searching";
+      initBluetooth();
+    };
+    const contactSupport = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/contactCostumer/contactCostumer"
+      });
+    };
+    common_vendor.onMounted(() => {
+      initBluetooth();
+    });
+    common_vendor.onUnmounted(() => {
+      stopBluetoothDevicesDiscovery();
+      common_vendor.index.closeBluetoothAdapter();
+    });
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: common_vendor.f(foundDevices.value, (device, index, i0) => {
