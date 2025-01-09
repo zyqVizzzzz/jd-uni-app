@@ -1,13 +1,20 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_moments = require("../../api/moments.js");
+const api_userRelations = require("../../api/userRelations.js");
+const utils_eventBus = require("../../utils/eventBus.js");
 require("../../utils/require.js");
 require("../../config.js");
 const pageSize = 20;
 const _sfc_main = {
   __name: "swimmer",
   setup(__props) {
-    const tabs = ["推荐", "关注", "我的"];
+    const tabConfig = [
+      { text: "推荐", type: "all" },
+      { text: "关注", type: "following" },
+      { text: "我的", type: "my" }
+    ];
+    const tabs = tabConfig.map((tab) => tab.text);
     const currentTab = common_vendor.ref(0);
     const posts = common_vendor.ref([]);
     const loading = common_vendor.ref(false);
@@ -18,10 +25,11 @@ const _sfc_main = {
         if (isRefresh) {
           page.value = 1;
         }
+        console.log(page.value);
         const params = {
-          page: page.value,
-          limit: pageSize,
-          type: tabs[currentTab.value].toLowerCase()
+          page: Number(page.value),
+          limit: Number(pageSize),
+          type: tabConfig[currentTab.value].type
         };
         const res = await api_moments.momentApi.getMoments(params);
         const currentUserId = JSON.parse(common_vendor.index.getStorageSync("userInfo"))._id;
@@ -31,12 +39,13 @@ const _sfc_main = {
             return {
               id: item._id,
               username: item.author.nickname,
+              authorId: item.author._id,
               avatar: item.author.avatarUrl,
               createTime: new Date(item.createdAt).toLocaleDateString("zh-CN"),
               content: item.content,
               image: ((_a = item.images) == null ? void 0 : _a[0]) || "",
               images: item.images || [],
-              isFollowed: false,
+              isFollowed: item.author.isFollowing,
               isLiked: (_b = item.likedBy) == null ? void 0 : _b.includes(currentUserId),
               // 添加这个字段，需要后端返回当前用户是否点赞
               likes: item.likeCount,
@@ -86,22 +95,120 @@ const _sfc_main = {
       currentTab.value = index;
       onRefresh();
     };
-    const handleFollow = (post) => {
-      post.isFollowed = !post.isFollowed;
-      common_vendor.index.showToast({
-        title: post.isFollowed ? "关注成功" : "已取消关注",
-        icon: "success"
+    const handleMore = (post) => {
+      const currentUserId = JSON.parse(common_vendor.index.getStorageSync("userInfo"))._id;
+      const isOwnPost = post.authorId === currentUserId;
+      const itemList = isOwnPost ? ["删除"] : ["举报", "不感兴趣"];
+      common_vendor.index.showActionSheet({
+        itemList,
+        success: async function(res) {
+          if (isOwnPost) {
+            switch (res.tapIndex) {
+              case 0:
+                try {
+                  await handleDeletePost(post.id);
+                } catch (error) {
+                  console.error("删除动态失败:", error);
+                }
+                break;
+              case 1:
+                common_vendor.index.showToast({
+                  title: "举报成功",
+                  icon: "success"
+                });
+                break;
+            }
+          } else {
+            switch (res.tapIndex) {
+              case 0:
+                common_vendor.index.showToast({
+                  title: "举报成功",
+                  icon: "success"
+                });
+                break;
+              case 1:
+                common_vendor.index.showToast({
+                  title: "已减少此类内容推荐",
+                  icon: "none"
+                });
+                break;
+            }
+          }
+        }
       });
+    };
+    const handleDeletePost = async (postId) => {
+      common_vendor.index.showModal({
+        title: "提示",
+        content: "确定要删除这条动态吗？",
+        success: async function(res) {
+          if (res.confirm) {
+            try {
+              const res2 = await api_moments.momentApi.deleteMoment(postId);
+              if (res2.data.code === 200) {
+                posts.value = posts.value.filter((p) => p.id !== postId);
+                common_vendor.index.showToast({
+                  title: "删除成功",
+                  icon: "success"
+                });
+              } else {
+                throw new Error(res2.data.message || "删除失败");
+              }
+            } catch (error) {
+              console.error("删除动态失败:", error);
+              common_vendor.index.showToast({
+                title: error.message || "删除失败",
+                icon: "none"
+              });
+            }
+          }
+        }
+      });
+    };
+    const handleFollow = async (post) => {
+      console.log(post);
+      try {
+        const userInfo = JSON.parse(common_vendor.index.getStorageSync("userInfo") || "{}");
+        let res;
+        if (!post.isFollowed) {
+          res = await api_userRelations.userRelationsApi.followUser(post.authorId);
+        } else {
+          res = await api_userRelations.userRelationsApi.unfollowUser(post.authorId);
+        }
+        if (res.data.code === 200 || res.data.code === 201) {
+          console.log(posts.value);
+          posts.value = posts.value.map((p) => {
+            if (p.authorId === post.authorId) {
+              return {
+                ...p,
+                isFollowed: !p.isFollowed
+              };
+            }
+            return p;
+          });
+        }
+      } catch (error) {
+        console.error("关注操作失败:", error);
+        common_vendor.index.showToast({
+          title: error.message || "操作失败",
+          icon: "none"
+        });
+      }
     };
     const handleLike = async (post) => {
       try {
         const res = await api_moments.momentApi.likeMoment(post.id);
         if (res.data.code === 201) {
           const { liked } = res.data.data;
-          post.likes += liked ? 1 : -1;
-          common_vendor.index.showToast({
-            title: liked ? "点赞成功" : "取消点赞",
-            icon: "success"
+          posts.value = posts.value.map((p) => {
+            if (p.id === post.id) {
+              return {
+                ...p,
+                likes: p.likes + (liked ? 1 : -1),
+                isLiked: liked
+              };
+            }
+            return p;
           });
         } else {
           throw new Error(res.data.message || "操作失败");
@@ -125,9 +232,9 @@ const _sfc_main = {
         url: "/pages/publish/publish"
       });
     };
-    const navigateToDetail = (postId) => {
+    const navigateToDetail = (postId, isFollowed) => {
       common_vendor.index.navigateTo({
-        url: `/pages/swimmerDetail/swimmerDetail?id=${postId}`
+        url: `/pages/swimmerDetail/swimmerDetail?id=${postId}&isFollowed=${isFollowed}`
       });
     };
     const previewImage = (url) => {
@@ -137,10 +244,14 @@ const _sfc_main = {
     };
     common_vendor.onMounted(() => {
       fetchMoments(true);
+      utils_eventBus.emitter.on("updateSwimmerList", () => {
+        console.log("收到更新事件");
+        fetchMoments(true);
+      });
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: common_vendor.f(tabs, (tab, index, i0) => {
+        a: common_vendor.f(common_vendor.unref(tabs), (tab, index, i0) => {
           return {
             a: common_vendor.t(tab),
             b: index,
@@ -157,27 +268,36 @@ const _sfc_main = {
             e: post.isFollowed ? 1 : "",
             f: common_vendor.o(($event) => handleFollow(post), index),
             g: common_vendor.t(post.content),
-            h: post.image
-          }, post.image ? {
-            i: post.image,
-            j: common_vendor.o(($event) => previewImage(post.image), index)
+            h: post.images && post.images.length > 0
+          }, post.images && post.images.length > 0 ? {
+            i: common_vendor.f(post.images, (image, imageIndex, i1) => {
+              return {
+                a: image,
+                b: imageIndex,
+                c: common_vendor.o(($event) => previewImage(post.images), imageIndex)
+              };
+            }),
+            j: common_vendor.n(post.images.length === 1 ? "single-image" : ""),
+            k: common_vendor.n(post.images.length === 4 ? "four-grid" : ""),
+            l: common_vendor.n(post.images.length > 4 ? "multi-grid" : "")
           } : {}, {
-            k: post.sportData
+            m: post.sportData
           }, post.sportData ? {
-            l: common_vendor.t(post.sportData.distance),
-            m: common_vendor.t(post.sportData.duration),
-            n: common_vendor.t(post.sportData.pace),
-            o: common_vendor.t(post.sportData.calories)
+            n: common_vendor.t(post.sportData.distance),
+            o: common_vendor.t(post.sportData.duration),
+            p: common_vendor.t(post.sportData.pace),
+            q: common_vendor.t(post.sportData.calories)
           } : {}, {
-            p: common_vendor.o(($event) => navigateToDetail(post.id), index),
-            q: post.isLiked ? "/static/icons/moments-share.png" : "/static/icons/moments-like.png",
-            r: common_vendor.t(post.likes),
-            s: common_vendor.o(($event) => handleLike(post), index),
-            t: common_vendor.t(post.comments),
-            v: common_vendor.o(($event) => navigateToDetail(post.id), index),
-            w: common_vendor.t(post.shares),
-            x: common_vendor.o(($event) => handleShare(), index),
-            y: index
+            r: common_vendor.o(($event) => navigateToDetail(post.id, post.isFollowed), index),
+            s: post.isLiked ? "/static/icons/moments-like-active.png" : "/static/icons/moments-like.png",
+            t: common_vendor.t(post.likes),
+            v: common_vendor.o(($event) => handleLike(post), index),
+            w: common_vendor.t(post.comments),
+            x: common_vendor.o(($event) => navigateToDetail(post.id, post.isFollowed), index),
+            y: common_vendor.t(post.shares),
+            z: common_vendor.o(($event) => handleShare(), index),
+            A: common_vendor.o(($event) => handleMore(post), index),
+            B: index
           });
         }),
         c: loading.value

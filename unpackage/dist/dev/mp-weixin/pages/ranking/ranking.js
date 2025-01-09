@@ -178,15 +178,17 @@ const _sfc_main = {
           return common_vendor.e({
             a: user
           }, user ? {
-            b: common_vendor.t(user.rank),
-            c: common_vendor.t(user.name),
-            d: common_vendor.t(user.score),
-            e: common_vendor.n(user.rank === 1 ? "yellow" : user.rank === 2 ? "orange" : "pink")
+            b: user.avatar || "/static/avatar-default@3x.png",
+            c: common_vendor.t(user.rank),
+            d: common_vendor.t(user.name),
+            e: common_vendor.t(user.score),
+            f: common_vendor.n(user.rank === 1 ? "yellow" : user.rank === 2 ? "orange" : "pink")
           } : {
-            f: common_vendor.t(index === 0 ? 2 : index === 1 ? 1 : 3),
-            g: common_vendor.n(index === 0 ? "orange" : index === 1 ? "yellow" : "pink")
+            g: user.avatar || "/static/avatar-default@3x.png",
+            h: common_vendor.t(index === 0 ? 2 : index === 1 ? 1 : 3),
+            i: common_vendor.n(index === 0 ? "orange" : index === 1 ? "yellow" : "pink")
           }, {
-            h: index
+            j: index
           });
         }),
         m: rankingList.value.length > 0
@@ -194,15 +196,17 @@ const _sfc_main = {
         n: common_vendor.f(rankingList.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.rank),
-            b: common_vendor.t(item.name),
-            c: common_vendor.t(item.distance),
-            d: item.rank
+            b: item.avatar || "/static/avatar-default@3x.png",
+            c: common_vendor.t(item.name),
+            d: common_vendor.t(item.distance),
+            e: item.rank
           };
         })
       } : {}, {
         o: common_vendor.t(currentUserRank.value.rank),
-        p: common_vendor.t(currentUserRank.value.name),
-        q: common_vendor.t(currentUserRank.value.distance)
+        p: currentUserRank.value.avatar || "/static/avatar-default@3x.png",
+        q: common_vendor.t(currentUserRank.value.name),
+        r: common_vendor.t(currentUserRank.value.distance)
       });
     };
   }

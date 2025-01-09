@@ -81,7 +81,7 @@
 					<view class="circle-outer">
 						<view class="circle-wrapper">
 							<image
-								src="/static/avatar.jpg"
+								:src="user.avatar || '/static/avatar-default@3x.png'"
 								class="avatar"
 								mode="aspectFill"
 							/>
@@ -103,7 +103,7 @@
 					<view class="circle-outer">
 						<view class="circle-wrapper">
 							<image
-								src="/static/avatar.jpg"
+								:src="user.avatar || '/static/avatar-default@3x.png'"
 								class="avatar"
 								mode="aspectFill"
 							/>
@@ -124,7 +124,11 @@
 		<view class="rank-list" v-if="rankingList.length > 0">
 			<view class="rank-item" v-for="item in rankingList" :key="item.rank">
 				<text class="rank-num">{{ item.rank }}</text>
-				<image src="/static/avatar.jpg" class="avatar" mode="aspectFill" />
+				<image
+					:src="item.avatar || '/static/avatar-default@3x.png'"
+					class="avatar"
+					mode="aspectFill"
+				/>
 				<view class="info">
 					<text class="name">{{ item.name }}</text>
 					<text class="distance">总距离 {{ item.distance }} 千米</text>
@@ -135,7 +139,11 @@
 		<!-- 固定在底部的当前用户排名 -->
 		<view class="current-user">
 			<text class="rank-num">{{ currentUserRank.rank }}</text>
-			<image src="/static/avatar.jpg" class="avatar" mode="aspectFill" />
+			<image
+				:src="currentUserRank.avatar || '/static/avatar-default@3x.png'"
+				class="avatar"
+				mode="aspectFill"
+			/>
 			<view class="info">
 				<text class="name">{{ currentUserRank.name }}</text>
 				<text class="distance">总距离 {{ currentUserRank.distance }}千米</text>

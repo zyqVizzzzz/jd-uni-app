@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const utils_require = require("../../utils/require.js");
 const config = require("../../config.js");
+const utils_eventBus = require("../../utils/eventBus.js");
 const _sfc_main = {
   __name: "profile",
   setup(__props) {
@@ -32,16 +33,25 @@ const _sfc_main = {
       }
       return heightOptions.findIndex((h) => parseInt(h) === userInfo.value.height) || 70;
     });
+    const MUNICIPALITIES = ["北京市", "上海市", "天津市", "重庆市"];
+    const formatCity = common_vendor.computed(() => {
+      const { province, city } = userInfo.value;
+      if (!province && !city) {
+        return "未设置";
+      }
+      if (MUNICIPALITIES.includes(province)) {
+        return province.replace("", "");
+      }
+      return `${city}`.trim();
+    });
     const handleCityChange = (e) => {
       const [province, city, district] = e.detail.value;
       const [provinceCode, cityCode, districtCode] = e.detail.code || [];
-      const cityDisplay = city || province;
       updateUserInfo({
         province,
-        city: cityDisplay,
+        city,
         district,
         provinceCode: provinceCode == null ? void 0 : provinceCode.toString(),
-        // 转换为字符串存储
         cityCode: cityCode == null ? void 0 : cityCode.toString(),
         districtCode: districtCode == null ? void 0 : districtCode.toString()
       });
@@ -79,7 +89,13 @@ const _sfc_main = {
           const userData = res.data.data;
           userInfo.value = userData;
           common_vendor.index.setStorageSync("userInfo", JSON.stringify(userData));
-          console.log(userInfo.value);
+          if (userData.province && userData.city) {
+            cityArray.value = [
+              userData.province,
+              userData.city,
+              userData.district || ""
+            ];
+          }
         }
       } catch (error) {
         console.error("获取用户信息失败:", error);
@@ -93,10 +109,7 @@ const _sfc_main = {
           data
         });
         if (res.data.code === 201) {
-          common_vendor.index.showToast({
-            title: "更新成功",
-            icon: "success"
-          });
+          utils_eventBus.emitter.emit("updateUserInfo");
           fetchUserInfo();
         }
       } catch (error) {
@@ -155,10 +168,7 @@ const _sfc_main = {
         });
         common_vendor.index.hideLoading();
         if (uploadRes.data.includes("201")) {
-          common_vendor.index.showToast({
-            title: "上传成功",
-            icon: "success"
-          });
+          utils_eventBus.emitter.emit("updateUserInfo");
           await fetchUserInfo();
         } else {
           throw new Error("上传失败");
@@ -266,7 +276,7 @@ const _sfc_main = {
         x: common_vendor.o(handleHeightChange),
         y: heightIndex.value,
         z: common_vendor.unref(heightOptions),
-        A: common_vendor.t(userInfo.value.city + " " + userInfo.value.district || "未设置"),
+        A: common_vendor.t(formatCity.value),
         B: common_vendor.o(handleCityChange),
         C: cityArray.value
       });

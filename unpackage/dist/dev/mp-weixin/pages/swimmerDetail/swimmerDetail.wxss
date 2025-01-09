@@ -42,11 +42,14 @@ page.data-v-fb374706 {
 }
 .user-info .follow-btn.data-v-fb374706 {
   font-size: 24rpx;
-  padding: 4rpx 30rpx;
-  border-radius: 32rpx;
+  padding: 0rpx 40rpx;
+  border-radius: 8rpx;
   background-color: #ffd700;
-  color: #fff;
+  color: #18191d;
   min-width: 120rpx;
+  border: none;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  margin-right: 10rpx;
 }
 .user-info .follow-btn.followed.data-v-fb374706 {
   background-color: #f0f0f0;
@@ -78,27 +81,31 @@ button.data-v-fb374706::after {
 }
 .interaction-bar.data-v-fb374706 {
   display: flex;
-  padding: 20rpx;
+  justify-content: space-between;
+  align-items: center;
+  padding: 36rpx 20rpx 16rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
-.interaction-bar .action-item.data-v-fb374706 {
-  flex: 1;
+.left-actions.data-v-fb374706 {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8rpx;
+  gap: 64rpx;
 }
-.interaction-bar .action-item .action-icon.data-v-fb374706 {
-  width: 42rpx;
-  height: 42rpx;
-  transition: transform 0.2s ease;
+.action-item.data-v-fb374706 {
+  display: flex;
+  align-items: center;
 }
-.interaction-bar .action-item .action-item:active .action-icon.data-v-fb374706 {
-  transform: scale(1.2);
+.action-item .action-icon.data-v-fb374706 {
+  width: 40rpx;
+  height: 40rpx;
 }
-.interaction-bar .action-item .count.data-v-fb374706 {
+.action-item .count.data-v-fb374706 {
   font-size: 24rpx;
-  color: #999;
+  color: #666;
+  margin-left: 8rpx;
+}
+.more-btn.data-v-fb374706 {
+  padding: 0 8rpx;
 }
 .comment-list.data-v-fb374706 {
   padding: 20rpx;

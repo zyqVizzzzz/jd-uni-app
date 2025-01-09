@@ -28,7 +28,11 @@
 		<!-- 发布按钮 -->
 		<view class="publish-footer">
 			<button class="publish-btn" :disabled="!isValid" @tap="submitPost">
-				<text class="camera-icon">📷</text>
+				<image
+					class="camera-icon"
+					src="/static/icons/camera.png"
+					mode="aspectFit"
+				></image>
 				发布
 			</button>
 		</view>
@@ -39,6 +43,7 @@
 import { ref, computed } from "vue";
 import { momentApi } from "@/api/moments";
 import config from "@/config";
+import emitter from "@/utils/eventBus";
 
 const content = ref("");
 const images = ref([]);
@@ -101,9 +106,9 @@ const submitPost = async () => {
 							},
 						});
 					});
-
-					if (res.data.code === 201 && res.data.data?.imageUrls?.[0]) {
-						imageUrls.push(res.data.data.imageUrls[0]);
+					console.log(res.code);
+					if (res.code === 201) {
+						imageUrls.push(res.data.imageUrls[0]);
 					} else {
 						throw new Error("图片上传失败");
 					}
@@ -119,27 +124,19 @@ const submitPost = async () => {
 		}
 
 		// 2. 发布动态
+		console.log(imageUrls);
 		const res = await momentApi.createMoment({
 			content: content.value.trim(),
 			images: imageUrls,
 		});
 
-		if (res.data.code === 200) {
+		if (res.data.code === 201) {
 			uni.hideLoading();
-			uni.showToast({
-				title: "发布成功",
-				icon: "success",
+			// 先标记需要刷新
+			emitter.emit("updateSwimmerList");
+			uni.reLaunch({
+				url: "/pages/swimmer/swimmer",
 			});
-
-			// 返回并刷新列表
-			setTimeout(() => {
-				const pages = getCurrentPages();
-				const prevPage = pages[pages.length - 2];
-				if (prevPage?.$vm?.onRefresh) {
-					prevPage.$vm.onRefresh();
-				}
-				uni.navigateBack();
-			}, 1500);
 		} else {
 			throw new Error(res.data.message || "发布失败");
 		}
@@ -154,7 +151,7 @@ const submitPost = async () => {
 };
 </script>
 
-<style>
+<style lang="scss">
 .publish-page {
 	min-height: 100vh;
 	background: #ffffff;
@@ -162,36 +159,11 @@ const submitPost = async () => {
 	flex-direction: column;
 }
 
-.nav-bar {
-	display: flex;
-	align-items: center;
-	padding: 0 30rpx;
-	height: 88rpx;
-	border-bottom: 1rpx solid #f5f5f5;
-}
-
-.back {
-	font-size: 40rpx;
-	width: 60rpx;
-}
-
-.title {
-	flex: 1;
-	text-align: center;
-	font-size: 32rpx;
-	font-weight: 500;
-}
-
-.menu {
-	width: 60rpx;
-	text-align: right;
-}
-
 .content-input {
 	width: 100%;
-	padding: 30rpx;
-	min-height: 200rpx;
-	font-size: 28rpx;
+	padding: 80rpx 30rpx;
+	min-height: 300rpx;
+	font-size: 32rpx;
 	box-sizing: border-box;
 }
 
@@ -199,17 +171,22 @@ const submitPost = async () => {
 	padding: 0 20rpx;
 	display: flex;
 	flex-wrap: wrap;
+	gap: 15rpx; // 使用gap来设置统一的间距
 }
 
 .grid-item {
-	width: 220rpx;
-	height: 220rpx;
-	margin: 10rpx;
+	width: calc((100% - 30rpx) / 3); // 减去两个间距(15rpx * 2)后平均分成3份
+	height: 0;
+	padding-bottom: calc((100% - 30rpx) / 3); // 保持1:1的宽高比
 	border-radius: 8rpx;
 	overflow: hidden;
+	position: relative;
 }
 
 .grid-item image {
+	position: absolute;
+	top: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
@@ -220,38 +197,50 @@ const submitPost = async () => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-}
 
-.plus {
-	font-size: 60rpx;
-	color: #999;
+	.plus {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-size: 60rpx;
+		color: #999;
+	}
 }
 
 .publish-footer {
 	margin-top: auto;
-	padding: 20rpx 30rpx;
+	padding: 20rpx 30rpx 80rpx;
 	background: #ffffff;
 }
 
 .publish-btn {
 	width: 100%;
-	height: 88rpx;
-	line-height: 88rpx;
+	height: 108rpx;
+	line-height: 108rpx;
 	text-align: center;
 	background: #ffd100;
 	color: #000000;
 	font-size: 32rpx;
-	border-radius: 44rpx;
+	border-radius: 54rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+
+	&::after {
+		border: none;
+	}
 }
 
 .camera-icon {
-	margin-right: 10rpx;
+	width: 40rpx;
+	height: 40rpx;
+	margin-right: 16rpx;
+	position: relative;
+	top: -2rpx;
 }
 
 .publish-btn[disabled] {
-	opacity: 0.6;
+	opacity: 0.8;
 }
 </style>

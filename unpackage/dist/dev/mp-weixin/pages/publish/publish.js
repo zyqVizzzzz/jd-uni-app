@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_moments = require("../../api/moments.js");
 const config = require("../../config.js");
+const utils_eventBus = require("../../utils/eventBus.js");
 require("../../utils/require.js");
 const _sfc_main = {
   __name: "publish",
@@ -28,7 +29,6 @@ const _sfc_main = {
       });
     };
     const submitPost = async () => {
-      var _a, _b;
       if (!isValid.value)
         return;
       try {
@@ -59,8 +59,9 @@ const _sfc_main = {
                   }
                 });
               });
-              if (res2.data.code === 201 && ((_b = (_a = res2.data.data) == null ? void 0 : _a.imageUrls) == null ? void 0 : _b[0])) {
-                imageUrls.push(res2.data.data.imageUrls[0]);
+              console.log(res2.code);
+              if (res2.code === 201) {
+                imageUrls.push(res2.data.imageUrls[0]);
               } else {
                 throw new Error("图片上传失败");
               }
@@ -74,25 +75,17 @@ const _sfc_main = {
             throw error;
           }
         }
+        console.log(imageUrls);
         const res = await api_moments.momentApi.createMoment({
           content: content.value.trim(),
           images: imageUrls
         });
-        if (res.data.code === 200) {
+        if (res.data.code === 201) {
           common_vendor.index.hideLoading();
-          common_vendor.index.showToast({
-            title: "发布成功",
-            icon: "success"
+          utils_eventBus.emitter.emit("updateSwimmerList");
+          common_vendor.index.reLaunch({
+            url: "/pages/swimmer/swimmer"
           });
-          setTimeout(() => {
-            var _a2;
-            const pages = getCurrentPages();
-            const prevPage = pages[pages.length - 2];
-            if ((_a2 = prevPage == null ? void 0 : prevPage.$vm) == null ? void 0 : _a2.onRefresh) {
-              prevPage.$vm.onRefresh();
-            }
-            common_vendor.index.navigateBack();
-          }, 1500);
         } else {
           throw new Error(res.data.message || "发布失败");
         }

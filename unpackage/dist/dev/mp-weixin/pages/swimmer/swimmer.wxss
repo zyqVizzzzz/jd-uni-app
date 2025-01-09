@@ -72,13 +72,14 @@
 }
 .user-info .follow-btn.data-v-1693b82a {
   font-size: 24rpx;
-  padding: 4rpx 30rpx;
-  border-radius: 32rpx;
+  padding: 0rpx 40rpx;
+  border-radius: 8rpx;
   background-color: #ffd700;
-  color: #fff;
+  color: #18191d;
   min-width: 120rpx;
   border: none;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  margin-right: 10rpx;
 }
 .user-info .follow-btn.followed.data-v-1693b82a {
   background-color: #f0f0f0;
@@ -96,11 +97,35 @@ button.data-v-1693b82a::after {
   line-height: 1.6;
   margin-bottom: 20rpx;
 }
-.post-content .post-image.data-v-1693b82a {
+.post-content .image-grid.data-v-1693b82a {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 30rpx;
+}
+.post-content .image-grid .image-grid-item.data-v-1693b82a {
+  position: relative;
+  width: calc((100% - 20rpx) / 3);
+  height: 200rpx;
+}
+.post-content .image-grid .image-grid-item.single-image.data-v-1693b82a {
   width: 100%;
   height: 400rpx;
+}
+.post-content .image-grid .image-grid-item.single-image .grid-image.data-v-1693b82a {
   border-radius: 12rpx;
-  margin-top: 20rpx;
+}
+.post-content .image-grid .image-grid-item.four-grid.data-v-1693b82a {
+  width: calc((100% - 10rpx) / 2);
+  height: 300rpx;
+}
+.post-content .image-grid .image-grid-item.multi-grid.data-v-1693b82a {
+  height: 200rpx;
+}
+.post-content .image-grid .image-grid-item .grid-image.data-v-1693b82a {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
 }
 .sport-data.data-v-1693b82a {
   display: flex;
@@ -126,23 +151,30 @@ button.data-v-1693b82a::after {
 }
 .interaction-bar.data-v-1693b82a {
   display: flex;
-  border-top: 1rpx solid #f0f0f0;
-  padding-top: 20rpx;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
 }
-.interaction-bar .action-item.data-v-1693b82a {
-  flex: 1;
+.left-actions.data-v-1693b82a {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8rpx;
+  gap: 64rpx;
 }
-.interaction-bar .action-item .action-icon.data-v-1693b82a {
+.action-item.data-v-1693b82a {
+  display: flex;
+  align-items: center;
+}
+.action-item .action-icon.data-v-1693b82a {
   width: 40rpx;
   height: 40rpx;
 }
-.interaction-bar .action-item .count.data-v-1693b82a {
+.action-item .count.data-v-1693b82a {
   font-size: 24rpx;
-  color: #999;
+  color: #666;
+  margin-left: 8rpx;
+}
+.more-btn.data-v-1693b82a {
+  padding: 0 8rpx;
 }
 .loading.data-v-1693b82a {
   text-align: center;
@@ -156,7 +188,6 @@ button.data-v-1693b82a::after {
   bottom: 140rpx;
   width: 120rpx;
   height: 120rpx;
-  background-color: #ffd700;
   border-radius: 50%;
   display: flex;
   align-items: center;

@@ -10,9 +10,7 @@
 					mode="aspectFill"
 				/>
 				<text class="username">{{ userInfo.nickname || "未设置昵称" }}</text>
-				<text class="description">{{
-					userInfo.bio || "写一个有趣的介绍吧..."
-				}}</text>
+				<text class="description">{{ userInfo.bio || "" }}</text>
 			</view>
 
 			<!-- 数据统计 -->
@@ -113,6 +111,10 @@
 
 		<!-- 功能菜单 -->
 		<view class="menu-list">
+			<view class="menu-item" @tap="navigateToAccount">
+				<text>账号信息</text>
+				<text class="arrow">></text>
+			</view>
 			<view class="menu-item" @tap="navigateToMessage">
 				<text>消息中心</text>
 				<text class="arrow">></text>
@@ -121,14 +123,11 @@
 				<text>联系客服</text>
 				<text class="arrow">></text>
 			</view>
-			<view class="menu-item" @tap="navigateToAccount">
-				<text>账号信息</text>
-				<text class="arrow">></text>
-			</view>
-			<view class="menu-item">
+
+			<!-- <view class="menu-item">
 				<text>语言设置</text>
 				<text class="arrow">></text>
-			</view>
+			</view> -->
 		</view>
 		<login-popup
 			ref="loginPopupRef"
@@ -143,6 +142,7 @@ import { ref, onMounted } from "vue";
 import { request } from "@/utils/require";
 import LoginPopup from "@/components/LoginPopup.vue";
 import { onShow } from "@dcloudio/uni-app";
+import emitter from "@/utils/eventBus";
 
 const loginPopupRef = ref(null);
 const activeTab = ref("device");
@@ -172,6 +172,12 @@ onMounted(() => {
 		}
 	}
 	checkLoginStatus(() => {
+		fetchUserInfo();
+		fetchUserDevices();
+	});
+
+	emitter.on("updateUserInfo", () => {
+		console.log("收到更新事件");
 		fetchUserInfo();
 		fetchUserDevices();
 	});

@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_require = require("../../utils/require.js");
+const utils_eventBus = require("../../utils/eventBus.js");
 require("../../config.js");
 if (!Math) {
   LoginPopup();
@@ -34,6 +35,11 @@ const _sfc_main = {
         }
       }
       checkLoginStatus(() => {
+        fetchUserInfo();
+        fetchUserDevices();
+      });
+      utils_eventBus.emitter.on("updateUserInfo", () => {
+        console.log("收到更新事件");
         fetchUserInfo();
         fetchUserDevices();
       });
@@ -134,7 +140,7 @@ const _sfc_main = {
       return common_vendor.e({
         a: userInfo.value.avatarUrl || "/static/avatar.jpg",
         b: common_vendor.t(userInfo.value.nickname || "未设置昵称"),
-        c: common_vendor.t(userInfo.value.bio || "写一个有趣的介绍吧..."),
+        c: common_vendor.t(userInfo.value.bio || ""),
         d: common_vendor.t(userInfo.value.following || 0),
         e: common_vendor.t(userInfo.value.followers || 0),
         f: common_vendor.t(userInfo.value.points || 0),
@@ -164,9 +170,9 @@ const _sfc_main = {
       } : {}, {
         t: activeTab.value === "medal"
       }, activeTab.value === "medal" ? {} : {}, {
-        v: common_vendor.o(navigateToMessage),
-        w: common_vendor.o(navigateToContact),
-        x: common_vendor.o(navigateToAccount),
+        v: common_vendor.o(navigateToAccount),
+        w: common_vendor.o(navigateToMessage),
+        x: common_vendor.o(navigateToContact),
         y: common_vendor.sr(loginPopupRef, "093d7f73-0", {
           "k": "loginPopupRef"
         }),

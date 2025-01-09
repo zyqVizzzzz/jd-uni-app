@@ -25,6 +25,13 @@ const momentApi = {
       data
     });
   },
+  // 删除动态
+  deleteMoment: (momentId) => {
+    return utils_require.request({
+      url: `/moments/${momentId}`,
+      method: "DELETE"
+    });
+  },
   // 上传图片，一次性上传多张
   batchUploadImages: (filePaths) => {
     return new Promise((resolve, reject) => {

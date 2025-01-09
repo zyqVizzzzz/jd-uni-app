@@ -1,3 +1,4 @@
+// 动态详情页
 <template>
 	<view class="post-detail">
 		<!-- 帖子内容区域 -->
@@ -35,33 +36,45 @@
 
 			<!-- 互动数据 -->
 			<view class="interaction-bar">
-				<view class="action-item" @tap="handleLike">
-					<image
-						class="action-icon"
-						:src="
-							post.isLiked
-								? '/static/icons/moments-share.png'
-								: '/static/icons/moments-like.png'
-						"
-						mode="aspectFit"
-					/>
-					<text class="count">{{ post.likes }}</text>
+				<!-- 左侧互动按钮组 -->
+				<view class="left-actions">
+					<view class="action-item" @tap="handleLike">
+						<image
+							class="action-icon"
+							:src="
+								post.isLiked
+									? '/static/icons/moments-like-active.png'
+									: '/static/icons/moments-like.png'
+							"
+							mode="aspectFit"
+						/>
+						<text class="count">{{ post.likes }}</text>
+					</view>
+					<view class="action-item">
+						<image
+							class="action-icon"
+							src="/static/icons/moments-comments.png"
+							mode="aspectFit"
+						/>
+						<text class="count">{{ post.comments }}</text>
+					</view>
+					<view class="action-item" @tap="handleShare">
+						<image
+							class="action-icon"
+							src="/static/icons/moments-share.png"
+							mode="aspectFit"
+						/>
+						<text class="count">{{ post.shares }}</text>
+					</view>
 				</view>
-				<view class="action-item">
+
+				<!-- 右侧更多按钮 -->
+				<view class="action-item more-btn" @tap="handleMore">
 					<image
 						class="action-icon"
-						src="/static/icons/moments-comments.png"
+						src="/static/icons/moments-more.png"
 						mode="aspectFit"
 					/>
-					<text class="count">{{ post.comments }}</text>
-				</view>
-				<view class="action-item" @tap="handleShare">
-					<image
-						class="action-icon"
-						src="/static/icons/moments-share.png"
-						mode="aspectFit"
-					/>
-					<text class="count">{{ post.shares }}</text>
 				</view>
 			</view>
 
@@ -133,16 +146,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { ref } from "vue";
+import { onLoad, onHide } from "@dcloudio/uni-app";
 import { momentApi } from "../../api/moments.js";
 import { interactionsApi } from "../../api/interactions.js";
 import { commentsApi } from "../../api/comments.js";
-import { formatTimeAgo } from "../../utils/timeFormat";
+import { userRelationsApi } from "../../api/userRelations.js";
+import emitter from "../../utils/eventBus";
 
 // 定义帖子数据
 const post = ref({});
 const postId = ref("");
+const isFollowed = ref(false);
 
 // 评论列表状态
 const commentList = ref([]);
@@ -170,10 +185,11 @@ const fetchPostDetail = async (id) => {
 				id: data._id,
 				username: data.author.nickname,
 				avatar: data.author.avatarUrl,
+				authorId: data.author._id,
 				location: data.location || "",
 				content: data.content,
 				images: data.images || [],
-				isFollowed: data.isFollowed,
+				isFollowed: isFollowed.value,
 				isLiked: data.likedBy?.includes(currentUserId),
 				likes: data.likeCount,
 				comments: data.commentCount,
@@ -242,6 +258,88 @@ const handleSendComment = async () => {
 			icon: "none",
 		});
 	}
+};
+
+const handleMore = () => {
+	// 获取当前登录用户ID
+	const currentUserId = JSON.parse(uni.getStorageSync("userInfo"))._id;
+	// 判断是否是自己的动态
+	console.log(post.value);
+	const isOwnPost = post.value.authorId === currentUserId;
+
+	// 根据是否是自己的动态显示不同的选项
+	const itemList = isOwnPost ? ["删除"] : ["举报", "不感兴趣"];
+
+	uni.showActionSheet({
+		itemList,
+		success: async function (res) {
+			if (isOwnPost) {
+				// 自己的动态
+				switch (res.tapIndex) {
+					case 0:
+						// 删除动态
+						try {
+							await handleDeletePost(post.value.id);
+						} catch (error) {
+							console.error("删除动态失败:", error);
+						}
+						break;
+				}
+			} else {
+				// 他人的动态
+				switch (res.tapIndex) {
+					case 0:
+						// 举报
+						uni.showToast({
+							title: "举报成功",
+							icon: "success",
+						});
+						break;
+					case 1:
+						// 不感兴趣
+						uni.showToast({
+							title: "已减少此类内容推荐",
+							icon: "none",
+						});
+						break;
+				}
+			}
+		},
+	});
+};
+
+// 处理删除动态
+const handleDeletePost = async (postId) => {
+	uni.showModal({
+		title: "提示",
+		content: "确定要删除这条动态吗？",
+		success: async function (res) {
+			if (res.confirm) {
+				try {
+					const res = await momentApi.deleteMoment(postId);
+					if (res.data.code === 200) {
+						uni.showToast({
+							title: "删除成功",
+							icon: "success",
+						});
+						// 返回上一页
+						emitter.emit("updateSwimmerList");
+						uni.switchTab({
+							url: "/pages/swimmer/swimmer",
+						});
+					} else {
+						throw new Error(res.data.message || "删除失败");
+					}
+				} catch (error) {
+					console.error("删除动态失败:", error);
+					uni.showToast({
+						title: error.message || "删除失败",
+						icon: "none",
+					});
+				}
+			}
+		},
+	});
 };
 
 // 处理评论点赞
@@ -321,12 +419,35 @@ const handleInputBlur = () => {
 };
 
 // 关注/取消关注
-const handleFollow = () => {
-	post.value.isFollowed = !post.value.isFollowed;
-	uni.showToast({
-		title: post.value.isFollowed ? "关注成功" : "已取消关注",
-		icon: "success",
-	});
+const handleFollow = async () => {
+	try {
+		// 判断是否是自己
+		const userInfo = JSON.parse(uni.getStorageSync("userInfo") || "{}");
+
+		// 调用关注/取关API
+		let res;
+		if (!post.value.isFollowed) {
+			res = await userRelationsApi.followUser(post.value.authorId);
+		} else {
+			res = await userRelationsApi.unfollowUser(post.value.authorId);
+		}
+
+		if (res.data.code === 200 || res.data.code === 201) {
+			// 更新动态详情中的关注状态
+			post.value.isFollowed = !post.value.isFollowed;
+
+			// 发送更新事件到动态列表页面
+			emitter.emit("updateSwimmerList");
+		} else {
+			throw new Error(res.data.message || "操作失败");
+		}
+	} catch (error) {
+		console.error("关注操作失败:", error);
+		uni.showToast({
+			title: error.message || "操作失败",
+			icon: "none",
+		});
+	}
 };
 
 // 点赞
@@ -338,10 +459,8 @@ const handleLike = async () => {
 			post.value.likes += liked ? 1 : -1;
 			post.value.isLiked = liked;
 
-			uni.showToast({
-				title: liked ? "点赞成功" : "取消点赞",
-				icon: "success",
-			});
+			// 发送更新事件
+			emitter.emit("updateSwimmerList");
 		} else {
 			throw new Error(res.data.message || "操作失败");
 		}
@@ -374,9 +493,15 @@ const previewImage = (index) => {
 onLoad((options) => {
 	if (options.id) {
 		postId.value = options.id;
+		isFollowed.value = options.isFollowed === "true" ? true : false;
+		console.log(isFollowed.value);
 		fetchPostDetail(options.id);
 		fetchComments(options.id);
 	}
+});
+
+onHide(() => {
+	emitter.emit("updateSwimmerList");
 });
 </script>
 
@@ -429,11 +554,14 @@ page {
 
 	.follow-btn {
 		font-size: 24rpx;
-		padding: 4rpx 30rpx;
-		border-radius: 32rpx;
+		padding: 0rpx 40rpx;
+		border-radius: 8rpx;
 		background-color: #ffd700;
-		color: #fff;
+		color: #18191d;
 		min-width: 120rpx;
+		border: none;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+		margin-right: 10rpx;
 
 		&.followed {
 			background-color: #f0f0f0;
@@ -473,31 +601,36 @@ button::after {
 
 .interaction-bar {
 	display: flex;
-	padding: 20rpx;
+	justify-content: space-between;
+	align-items: center;
+	padding: 36rpx 20rpx 16rpx;
 	border-bottom: 1rpx solid #f0f0f0;
+}
 
-	.action-item {
-		flex: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8rpx;
+.left-actions {
+	display: flex;
+	align-items: center;
+	gap: 64rpx;
+}
 
-		.action-icon {
-			width: 42rpx;
-			height: 42rpx;
-			transition: transform 0.2s ease;
-		}
+.action-item {
+	display: flex;
+	align-items: center;
 
-		.action-item:active .action-icon {
-			transform: scale(1.2);
-		}
-
-		.count {
-			font-size: 24rpx;
-			color: #999;
-		}
+	.action-icon {
+		width: 40rpx;
+		height: 40rpx;
 	}
+
+	.count {
+		font-size: 24rpx;
+		color: #666;
+		margin-left: 8rpx;
+	}
+}
+
+.more-btn {
+	padding: 0 8rpx;
 }
 
 .comment-list {

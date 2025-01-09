@@ -93,11 +93,18 @@
 			<view class="list-item">
 				<text class="label">城市</text>
 				<picker mode="region" @change="handleCityChange" :value="cityArray">
+					<text class="value">
+						{{ formatCity }} <text v-html="'>'"></text>
+					</text>
+				</picker>
+
+				<!-- <text class="label">城市</text>
+				<picker mode="region" @change="handleCityChange" :value="cityArray">
 					<text class="value"
 						>{{ userInfo.city + " " + userInfo.district || "未设置" }}
 						<text v-html="'>'"></text
 					></text>
-				</picker>
+				</picker> -->
 			</view>
 		</view>
 	</view>
@@ -107,6 +114,7 @@
 import { ref, computed, onMounted } from "vue";
 import { request } from "@/utils/require";
 import config from "@/config";
+import emitter from "@/utils/eventBus";
 
 const userInfo = ref({});
 
@@ -147,19 +155,37 @@ const heightIndex = computed(() => {
 	);
 });
 
+const MUNICIPALITIES = ["北京市", "上海市", "天津市", "重庆市"];
+
+const formatCity = computed(() => {
+	const { province, city } = userInfo.value;
+
+	// 当没有省市数据时返回"未设置"
+	if (!province && !city) {
+		return "未设置";
+	}
+
+	// 处理直辖市
+	if (MUNICIPALITIES.includes(province)) {
+		// 直辖市只显示省级名称，去掉"市"字
+		return province.replace("", "");
+	}
+
+	// 其他省份显示"省 市"格式
+	return `${city}`.trim();
+});
+
 // 处理城市选择变化
 const handleCityChange = (e) => {
 	const [province, city, district] = e.detail.value;
 	const [provinceCode, cityCode, districtCode] = e.detail.code || [];
 
-	// 更新显示的城市信息（这里可以根据需求决定是否显示省份和区）
-	const cityDisplay = city || province; // 这里只显示市级名称，可以根据需求调整
-
+	// 更新用户信息，保存完整的省市区信息
 	updateUserInfo({
 		province,
-		city: cityDisplay,
+		city,
 		district,
-		provinceCode: provinceCode?.toString(), // 转换为字符串存储
+		provinceCode: provinceCode?.toString(),
 		cityCode: cityCode?.toString(),
 		districtCode: districtCode?.toString(),
 	});
@@ -212,7 +238,15 @@ const fetchUserInfo = async () => {
 			const userData = res.data.data;
 			userInfo.value = userData;
 			uni.setStorageSync("userInfo", JSON.stringify(userData));
-			console.log(userInfo.value);
+
+			// 如果有城市数据，更新 cityArray
+			if (userData.province && userData.city) {
+				cityArray.value = [
+					userData.province,
+					userData.city,
+					userData.district || "",
+				];
+			}
 		}
 	} catch (error) {
 		console.error("获取用户信息失败:", error);
@@ -228,10 +262,7 @@ const updateUserInfo = async (data) => {
 			data,
 		});
 		if (res.data.code === 201) {
-			uni.showToast({
-				title: "更新成功",
-				icon: "success",
-			});
+			emitter.emit("updateUserInfo");
 			fetchUserInfo();
 		}
 	} catch (error) {
@@ -301,11 +332,7 @@ const uploadAvatar = async (filePath) => {
 
 		// 小程序默认会把 res 返回成字符串，而不是对象，这里需要优化
 		if (uploadRes.data.includes("201")) {
-			uni.showToast({
-				title: "上传成功",
-				icon: "success",
-			});
-
+			emitter.emit("updateUserInfo");
 			// 重新获取用户信息以更新头像
 			await fetchUserInfo();
 		} else {

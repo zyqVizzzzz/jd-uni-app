@@ -2,6 +2,8 @@
 const common_vendor = require("../../common/vendor.js");
 const api_moments = require("../../api/moments.js");
 const api_comments = require("../../api/comments.js");
+const api_userRelations = require("../../api/userRelations.js");
+const utils_eventBus = require("../../utils/eventBus.js");
 require("../../utils/require.js");
 require("../../config.js");
 const _sfc_main = {
@@ -9,6 +11,7 @@ const _sfc_main = {
   setup(__props) {
     const post = common_vendor.ref({});
     const postId = common_vendor.ref("");
+    const isFollowed = common_vendor.ref(false);
     const commentList = common_vendor.ref([]);
     common_vendor.ref(1);
     common_vendor.ref(false);
@@ -28,10 +31,11 @@ const _sfc_main = {
             id: data._id,
             username: data.author.nickname,
             avatar: data.author.avatarUrl,
+            authorId: data.author._id,
             location: data.location || "",
             content: data.content,
             images: data.images || [],
-            isFollowed: data.isFollowed,
+            isFollowed: isFollowed.value,
             isLiked: (_a = data.likedBy) == null ? void 0 : _a.includes(currentUserId),
             likes: data.likeCount,
             comments: data.commentCount,
@@ -93,6 +97,74 @@ const _sfc_main = {
         });
       }
     };
+    const handleMore = () => {
+      const currentUserId = JSON.parse(common_vendor.index.getStorageSync("userInfo"))._id;
+      console.log(post.value);
+      const isOwnPost = post.value.authorId === currentUserId;
+      const itemList = isOwnPost ? ["删除"] : ["举报", "不感兴趣"];
+      common_vendor.index.showActionSheet({
+        itemList,
+        success: async function(res) {
+          if (isOwnPost) {
+            switch (res.tapIndex) {
+              case 0:
+                try {
+                  await handleDeletePost(post.value.id);
+                } catch (error) {
+                  console.error("删除动态失败:", error);
+                }
+                break;
+            }
+          } else {
+            switch (res.tapIndex) {
+              case 0:
+                common_vendor.index.showToast({
+                  title: "举报成功",
+                  icon: "success"
+                });
+                break;
+              case 1:
+                common_vendor.index.showToast({
+                  title: "已减少此类内容推荐",
+                  icon: "none"
+                });
+                break;
+            }
+          }
+        }
+      });
+    };
+    const handleDeletePost = async (postId2) => {
+      common_vendor.index.showModal({
+        title: "提示",
+        content: "确定要删除这条动态吗？",
+        success: async function(res) {
+          if (res.confirm) {
+            try {
+              const res2 = await api_moments.momentApi.deleteMoment(postId2);
+              if (res2.data.code === 200) {
+                common_vendor.index.showToast({
+                  title: "删除成功",
+                  icon: "success"
+                });
+                utils_eventBus.emitter.emit("updateSwimmerList");
+                common_vendor.index.switchTab({
+                  url: "/pages/swimmer/swimmer"
+                });
+              } else {
+                throw new Error(res2.data.message || "删除失败");
+              }
+            } catch (error) {
+              console.error("删除动态失败:", error);
+              common_vendor.index.showToast({
+                title: error.message || "删除失败",
+                icon: "none"
+              });
+            }
+          }
+        }
+      });
+    };
     const handleReply = (comment) => {
       replyTo.value = comment;
       inputFocus.value = true;
@@ -109,12 +181,28 @@ const _sfc_main = {
     const handleInputBlur = () => {
       inputFocus.value = false;
     };
-    const handleFollow = () => {
-      post.value.isFollowed = !post.value.isFollowed;
-      common_vendor.index.showToast({
-        title: post.value.isFollowed ? "关注成功" : "已取消关注",
-        icon: "success"
-      });
+    const handleFollow = async () => {
+      try {
+        const userInfo = JSON.parse(common_vendor.index.getStorageSync("userInfo") || "{}");
+        let res;
+        if (!post.value.isFollowed) {
+          res = await api_userRelations.userRelationsApi.followUser(post.value.authorId);
+        } else {
+          res = await api_userRelations.userRelationsApi.unfollowUser(post.value.authorId);
+        }
+        if (res.data.code === 200 || res.data.code === 201) {
+          post.value.isFollowed = !post.value.isFollowed;
+          utils_eventBus.emitter.emit("updateSwimmerList");
+        } else {
+          throw new Error(res.data.message || "操作失败");
+        }
+      } catch (error) {
+        console.error("关注操作失败:", error);
+        common_vendor.index.showToast({
+          title: error.message || "操作失败",
+          icon: "none"
+        });
+      }
     };
     const handleLike = async () => {
       try {
@@ -123,10 +211,7 @@ const _sfc_main = {
           const { liked } = res.data.data;
           post.value.likes += liked ? 1 : -1;
           post.value.isLiked = liked;
-          common_vendor.index.showToast({
-            title: liked ? "点赞成功" : "取消点赞",
-            icon: "success"
-          });
+          utils_eventBus.emitter.emit("updateSwimmerList");
         } else {
           throw new Error(res.data.message || "操作失败");
         }
@@ -153,9 +238,14 @@ const _sfc_main = {
     common_vendor.onLoad((options) => {
       if (options.id) {
         postId.value = options.id;
+        isFollowed.value = options.isFollowed === "true" ? true : false;
+        console.log(isFollowed.value);
         fetchPostDetail(options.id);
         fetchComments(options.id);
       }
+    });
+    common_vendor.onHide(() => {
+      utils_eventBus.emitter.emit("updateSwimmerList");
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
@@ -176,13 +266,14 @@ const _sfc_main = {
           };
         })
       } : {}, {
-        j: post.value.isLiked ? "/static/icons/moments-share.png" : "/static/icons/moments-like.png",
+        j: post.value.isLiked ? "/static/icons/moments-like-active.png" : "/static/icons/moments-like.png",
         k: common_vendor.t(post.value.likes),
         l: common_vendor.o(handleLike),
         m: common_vendor.t(post.value.comments),
         n: common_vendor.t(post.value.shares),
         o: common_vendor.o(handleShare),
-        p: common_vendor.f(commentList.value, (comment, k0, i0) => {
+        p: common_vendor.o(handleMore),
+        q: common_vendor.f(commentList.value, (comment, k0, i0) => {
           return common_vendor.e({
             a: comment.author.avatarUrl,
             b: !comment.parentComment
@@ -198,17 +289,17 @@ const _sfc_main = {
             i: comment._id
           });
         }),
-        q: replyTo.value ? `回复 @${replyTo.value.author.nickname}` : "说点什么吧...",
-        r: inputFocus.value,
-        s: common_vendor.o(handleInputBlur),
-        t: commentText.value,
-        v: common_vendor.o(($event) => commentText.value = $event.detail.value),
-        w: replyTo.value
+        r: replyTo.value ? `回复 @${replyTo.value.author.nickname}` : "说点什么吧...",
+        s: inputFocus.value,
+        t: common_vendor.o(handleInputBlur),
+        v: commentText.value,
+        w: common_vendor.o(($event) => commentText.value = $event.detail.value),
+        x: replyTo.value
       }, replyTo.value ? {
-        x: common_vendor.o(cancelReply)
+        y: common_vendor.o(cancelReply)
       } : {}, {
-        y: commentText.value.length > 0 ? 1 : "",
-        z: common_vendor.o(handleSendComment)
+        z: commentText.value.length > 0 ? 1 : "",
+        A: common_vendor.o(handleSendComment)
       });
     };
   }
