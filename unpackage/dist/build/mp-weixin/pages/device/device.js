@@ -1,0 +1,1 @@
+"use strict";const e=require("../../common/vendor.js"),c={__name:"device",setup(c){const r=()=>{e.index.navigateTo({url:"/pages/deviceSearch/deviceSearch"})};return(c,a)=>({a:e.o(r)})}};wx.createPage(c);

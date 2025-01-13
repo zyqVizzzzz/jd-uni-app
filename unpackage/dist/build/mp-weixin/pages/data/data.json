@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "游泳数据",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "login-popup": "../../components/LoginPopup"
+  }
+}

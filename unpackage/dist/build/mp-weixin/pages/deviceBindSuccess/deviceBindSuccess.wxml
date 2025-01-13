@@ -1,0 +1,1 @@
+<view class="finding-device-page"><view class="device-status"><view class="device-image-container"><image src="/static/device-bind-success@3x.png" mode="aspectFit" class="status-image"/></view><text class="status-text">绑定成功</text></view><view class="action"><button bindtap="{{a}}" class="find-device-button"> 填写信息 </button></view></view>

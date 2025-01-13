@@ -82,13 +82,14 @@
 .daily-tasks .task-list .task-item .task-button.data-v-9bbf7136 {
   padding: 10rpx 30rpx;
   font-size: 24rpx;
-  color: #fff;
+  color: #222;
   background: #ffd100;
   border-radius: 16rpx;
   border: none;
 }
 .daily-tasks .task-list .task-item .task-button.completed.data-v-9bbf7136 {
   background: #ccc;
+  color: #909399;
 }
 .daily-tasks .task-list .task-item .task-button.data-v-9bbf7136::after {
   border: none;

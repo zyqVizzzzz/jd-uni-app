@@ -47,6 +47,7 @@ const _sfc_main = {
       }
     };
     const handleLogin = async () => {
+      var _a, _b;
       if (!isAgreed.value) {
         common_vendor.index.showToast({
           title: "请先同意用户协议和隐私政策",
@@ -69,7 +70,15 @@ const _sfc_main = {
         if (res.data.code === 201 && res.data.data.access_token) {
           token.value = res.data.data.access_token;
           common_vendor.index.setStorageSync("token", token.value);
-          step.value = 2;
+          if (((_a = res.data.data.user) == null ? void 0 : _a.nickname) && ((_b = res.data.data.user) == null ? void 0 : _b.avatarUrl)) {
+            emit("success", {
+              token: token.value,
+              user: res.data.data.user
+            });
+            handleClose();
+          } else {
+            step.value = 2;
+          }
         }
       } catch (error) {
         console.error("登录错误", error);
@@ -87,6 +96,7 @@ const _sfc_main = {
         const profileRes = await common_vendor.index.getUserProfile({
           desc: "用于完善用户资料"
         });
+        console.log("微信返回的用户信息：", profileRes.userInfo);
         const updatedUser = await updateUserInfo(profileRes.userInfo);
         emit("success", {
           token: token.value,

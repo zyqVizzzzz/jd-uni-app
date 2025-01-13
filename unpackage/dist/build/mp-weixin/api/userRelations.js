@@ -1,0 +1,1 @@
+"use strict";const e=require("../utils/require.js"),r={followUser:r=>e.request({url:`/user-relations/follow/${r}`,method:"POST"}),unfollowUser:r=>e.request({url:`/user-relations/follow/${r}`,method:"DELETE"}),getRelationStatus:r=>e.request({url:`/user-relations/check/${r}`,method:"GET"})};exports.userRelationsApi=r;

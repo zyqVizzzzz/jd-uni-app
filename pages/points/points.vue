@@ -76,10 +76,10 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { request } from "../../utils/require";
+import { ref, onMounted } from "vue";
+import { pointApi } from "@/api/points";
 
-const points = ref(2899);
+const points = ref(0);
 const tasks = ref([
 	{
 		id: 1,
@@ -99,7 +99,7 @@ const tasks = ref([
 	},
 	{
 		id: 3,
-		name: "发布动态(0/1)",
+		name: "发布动态",
 		points: 20,
 		completed: false,
 		icon: "/static/icons/points-post.png",
@@ -107,7 +107,7 @@ const tasks = ref([
 	},
 	{
 		id: 4,
-		name: "分享游泳数据(0/1)",
+		name: "分享游泳数据",
 		points: 30,
 		completed: false,
 		icon: "/static/icons/points-share.png",
@@ -130,13 +130,59 @@ const exchangeItems = ref([
 	},
 ]);
 
-// 处理返回
-const handleBack = () => {
-	uni.navigateBack();
+// 获取每日任务状态
+const fetchDailyTasks = async () => {
+	try {
+		const res = await pointApi.getDailyTasks();
+		if (res.data.code === 200) {
+			// 更新任务状态
+			tasks.value = tasks.value.map((task) => {
+				const taskStatus = res.data.data.find((item) => {
+					switch (task.id) {
+						case 1:
+							return item.type === "SWIM_500M";
+						case 2:
+							return item.type === "SWIM_1000M";
+						case 3:
+							return item.type === "POST_STATUS";
+						case 4:
+							return item.type === "SHARE_DATA";
+						default:
+							return false;
+					}
+				});
+				return {
+					...task,
+					completed: taskStatus ? taskStatus.completed : false,
+				};
+			});
+		}
+	} catch (error) {
+		uni.showToast({
+			title: "获取任务状态失败",
+			icon: "none",
+		});
+	}
 };
 
+const fetchPoints = async () => {
+	try {
+		const res = await pointApi.getUserPoints();
+		if (res.data.code === 200) {
+			// 更新任务状态
+			points.value = res.data.data.totalPoints;
+		}
+	} catch (error) {}
+};
+
+// 页面加载时获取任务状态
+onMounted(() => {
+	fetchDailyTasks();
+	fetchPoints();
+});
+
 const navigateToDetails = () => {
-	uni.navigateTo({ url: "/pages/points/details" });
+	uni.navigateTo({ url: "/pages/points/details?points=" + points.value });
 };
 
 // 处理任务点击
@@ -290,13 +336,14 @@ const handleExchange = async (item) => {
 			.task-button {
 				padding: 10rpx 30rpx;
 				font-size: 24rpx;
-				color: #fff;
+				color: #222;
 				background: #ffd100;
 				border-radius: 16rpx;
 				border: none;
 
 				&.completed {
 					background: #ccc;
+					color: rgba(144, 147, 153, 1);
 				}
 				&::after {
 					border: none;

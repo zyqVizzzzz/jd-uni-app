@@ -1,11 +1,12 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const utils_require = require("../../utils/require.js");
+const api_points = require("../../api/points.js");
+require("../../utils/require.js");
 require("../../config.js");
 const _sfc_main = {
   __name: "points",
   setup(__props) {
-    const points = common_vendor.ref(2899);
+    const points = common_vendor.ref(0);
     const tasks = common_vendor.ref([
       {
         id: 1,
@@ -25,7 +26,7 @@ const _sfc_main = {
       },
       {
         id: 3,
-        name: "发布动态(0/1)",
+        name: "发布动态",
         points: 20,
         completed: false,
         icon: "/static/icons/points-post.png",
@@ -33,7 +34,7 @@ const _sfc_main = {
       },
       {
         id: 4,
-        name: "分享游泳数据(0/1)",
+        name: "分享游泳数据",
         points: 30,
         completed: false,
         icon: "/static/icons/points-share.png",
@@ -54,8 +55,53 @@ const _sfc_main = {
         image: "/static/avatar2.jpg"
       }
     ]);
+    const fetchDailyTasks = async () => {
+      try {
+        const res = await api_points.pointApi.getDailyTasks();
+        if (res.data.code === 200) {
+          tasks.value = tasks.value.map((task) => {
+            const taskStatus = res.data.data.find((item) => {
+              switch (task.id) {
+                case 1:
+                  return item.type === "SWIM_500M";
+                case 2:
+                  return item.type === "SWIM_1000M";
+                case 3:
+                  return item.type === "POST_STATUS";
+                case 4:
+                  return item.type === "SHARE_DATA";
+                default:
+                  return false;
+              }
+            });
+            return {
+              ...task,
+              completed: taskStatus ? taskStatus.completed : false
+            };
+          });
+        }
+      } catch (error) {
+        common_vendor.index.showToast({
+          title: "获取任务状态失败",
+          icon: "none"
+        });
+      }
+    };
+    const fetchPoints = async () => {
+      try {
+        const res = await api_points.pointApi.getUserPoints();
+        if (res.data.code === 200) {
+          points.value = res.data.data.totalPoints;
+        }
+      } catch (error) {
+      }
+    };
+    common_vendor.onMounted(() => {
+      fetchDailyTasks();
+      fetchPoints();
+    });
     const navigateToDetails = () => {
-      common_vendor.index.navigateTo({ url: "/pages/points/details" });
+      common_vendor.index.navigateTo({ url: "/pages/points/details?points=" + points.value });
     };
     const handleTask = async (task) => {
       if (task.completed)
@@ -82,7 +128,7 @@ const _sfc_main = {
         return;
       }
       try {
-        const res = await utils_require.request({
+        const res = await request({
           url: "/points/exchange",
           method: "POST",
           data: {

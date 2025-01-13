@@ -6,7 +6,7 @@
 				<text class="active">积分规则</text>
 			</view>
 			<view class="points-number">
-				<text>2899</text>
+				<text>{{ points }}</text>
 			</view>
 			<text class="points-label">我的积分</text>
 		</view>
@@ -30,8 +30,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { onLoad, onHide } from "@dcloudio/uni-app";
+import { pointApi } from "@/api/points";
 
+const taskTypeMap = {
+	SWIM_500M: "游泳距离达到500米",
+	SWIM_1000M: "游泳距离达到1000米",
+	POST_STATUS: "发布动态",
+	SHARE_DATA: "分享游泳数据",
+};
+
+const points = ref(0);
 const pointsList = ref([
 	{
 		title: "游泳距离达到500米",
@@ -49,6 +59,45 @@ const pointsList = ref([
 		points: 40,
 	},
 ]);
+
+const fetchPointsList = async () => {
+	try {
+		const res = await pointApi.getPointsHistory();
+		console.log(res.data);
+		if (res.data.code === 200) {
+			pointsList.value = res.data.data.map((item) => ({
+				title: taskTypeMap[item.type] || "未知任务",
+				time: formatDate(item.createdAt),
+				points: item.points,
+			}));
+		}
+	} catch (error) {
+		console.error("Error fetching points list:", error);
+	}
+};
+
+const formatDate = (dateString) => {
+	const date = new Date(dateString);
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	const hours = String(date.getHours()).padStart(2, "0");
+	const minutes = String(date.getMinutes()).padStart(2, "0");
+	const seconds = String(date.getSeconds()).padStart(2, "0");
+	return `${year}.${month}.${day} ${hours}:${minutes}:${seconds}`;
+};
+
+onMounted(() => {
+	fetchPointsList();
+});
+
+// 页面加载时获取动态ID并请求数据
+onLoad((options) => {
+	if (options.points) {
+		points.value = parseInt(options.points);
+		console.log(points.value);
+	}
+});
 </script>
 
 <style lang="scss" scoped>
