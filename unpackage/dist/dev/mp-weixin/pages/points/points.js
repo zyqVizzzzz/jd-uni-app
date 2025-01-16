@@ -46,7 +46,7 @@ const _sfc_main = {
         id: 1,
         name: "焦动XXXXXX",
         points: 5e3,
-        image: "/static/avatar2.jpg"
+        image: "/static/avatar.jpg"
       },
       {
         id: 2,

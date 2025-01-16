@@ -29,10 +29,16 @@ const _sfc_main = {
         url: "/pages/profile/profile"
       });
     };
+    const navigateToAbout = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/about/about"
+      });
+    };
     return (_ctx, _cache) => {
       return {
-        a: userInfo.value.avatarUrl || "/static/avatar.jpg",
-        b: common_vendor.o(navigateToProfile)
+        a: userInfo.value.avatarUrl || "/static/avatar.png",
+        b: common_vendor.o(navigateToProfile),
+        c: common_vendor.o(navigateToAbout)
       };
     };
   }

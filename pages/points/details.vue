@@ -1,8 +1,7 @@
-# /pages/points/detail.vue
 <template>
 	<view class="points-detail">
 		<view class="points-display">
-			<view class="points-tab">
+			<view class="points-tab" @tap="navigateToRules">
 				<text class="active">积分规则</text>
 			</view>
 			<view class="points-number">
@@ -85,6 +84,12 @@ const formatDate = (dateString) => {
 	const minutes = String(date.getMinutes()).padStart(2, "0");
 	const seconds = String(date.getSeconds()).padStart(2, "0");
 	return `${year}.${month}.${day} ${hours}:${minutes}:${seconds}`;
+};
+
+const navigateToRules = () => {
+	uni.navigateTo({
+		url: "/pages/agreement/point",
+	});
 };
 
 onMounted(() => {

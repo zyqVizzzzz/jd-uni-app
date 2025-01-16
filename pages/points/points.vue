@@ -120,7 +120,7 @@ const exchangeItems = ref([
 		id: 1,
 		name: "焦动XXXXXX",
 		points: 5000,
-		image: "/static/avatar2.jpg",
+		image: "/static/avatar.jpg",
 	},
 	{
 		id: 2,

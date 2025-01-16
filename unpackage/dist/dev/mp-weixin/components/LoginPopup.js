@@ -23,11 +23,6 @@ const _sfc_main = {
     const handleAgreementChange = (e) => {
       isAgreed.value = e.detail.value.length > 0;
     };
-    const openPrivacyPolicy = () => {
-      common_vendor.index.navigateTo({
-        url: "/pages/agreement/privacy"
-      });
-    };
     const openUserAgreement = () => {
       common_vendor.index.navigateTo({
         url: "/pages/agreement/user"
@@ -138,22 +133,21 @@ const _sfc_main = {
         a: step.value === 1
       }, step.value === 1 ? {
         b: isAgreed.value,
-        c: common_vendor.o(openPrivacyPolicy),
-        d: common_vendor.o(openUserAgreement),
-        e: common_vendor.o(handleAgreementChange),
-        f: common_vendor.o(handleLogin),
-        g: loading.value,
-        h: !isAgreed.value,
-        i: !isAgreed.value ? 1 : ""
+        c: common_vendor.o(openUserAgreement),
+        d: common_vendor.o(handleAgreementChange),
+        e: common_vendor.o(handleLogin),
+        f: loading.value,
+        g: !isAgreed.value,
+        h: !isAgreed.value ? 1 : ""
       } : {
-        j: common_vendor.o(handleGetUserInfo),
-        k: loading.value,
-        l: common_vendor.o(handleSkip)
+        i: common_vendor.o(handleGetUserInfo),
+        j: loading.value,
+        k: common_vendor.o(handleSkip)
       }, {
-        m: common_vendor.sr(popup, "dc57fbbe-0", {
+        l: common_vendor.sr(popup, "dc57fbbe-0", {
           "k": "popup"
         }),
-        n: common_vendor.p({
+        m: common_vendor.p({
           type: "bottom",
           ["background-color"]: "#fff"
         })

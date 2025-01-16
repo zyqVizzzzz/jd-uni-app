@@ -20,8 +20,8 @@
 						<label class="agreement-label">
 							<checkbox value="1" color="#07c160" :checked="isAgreed" />
 							<text class="agreement-text">我已阅读并同意</text>
-							<text class="link" @tap="openPrivacyPolicy">《隐私政策》</text>
-							<text class="agreement-text">和</text>
+							<!-- <text class="link" @tap="openPrivacyPolicy">《隐私政策》</text>
+							<text class="agreement-text">和</text> -->
 							<text class="link" @tap="openUserAgreement">《用户协议》</text>
 						</label>
 					</checkbox-group>

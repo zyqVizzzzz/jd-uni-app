@@ -155,7 +155,7 @@
 .progress-fill.data-v-98b81aa6 {
   position: absolute;
   height: 100%;
-  background-color: #FAD161;
+  background-color: #fad161;
   transition: width 0.3s ease;
   border-radius: 9999px;
 }
@@ -166,4 +166,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.add-record-btn.data-v-98b81aa6 {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #07c160;
+  padding: 12px 24px;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(7, 193, 96, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+.add-record-btn.data-v-98b81aa6:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(7, 193, 96, 0.2);
+}
+.add-record-btn .btn-text.data-v-98b81aa6 {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
 }

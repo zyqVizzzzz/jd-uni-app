@@ -178,6 +178,34 @@
 				"navigationBarTitleText": "消息",
 				"enablePullDownRefresh": false
 			}
+		},
+		{
+			"path": "pages/agreement/user",
+			"style": {
+				"navigationBarTitleText": "用户协议",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/about/about",
+			"style": {
+				"navigationBarTitleText": "关于我们",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/agreement/point",
+			"style": {
+				"navigationBarTitleText": "积分规则",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/followingList/followingList",
+			"style": {
+				"navigationBarTitleText": "关注列表",
+				"enablePullDownRefresh": false
+			}
 		}
 	],
 	"globalStyle": {

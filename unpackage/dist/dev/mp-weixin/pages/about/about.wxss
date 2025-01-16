@@ -1,0 +1,51 @@
+/* 水平间距 */
+/* 水平间距 */
+.about-page.data-v-13a78ac6 {
+  min-height: 100vh;
+  background-color: #f4f8fb;
+  padding-top: 40rpx;
+}
+.about-content.data-v-13a78ac6 {
+  padding: 68rpx 32rpx 32rpx;
+  margin: 0 40rpx;
+  border-radius: 16rpx;
+  background-color: #fff;
+}
+.about-content .title-section.data-v-13a78ac6 {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 48rpx;
+}
+.about-content .title-section .highlight-title.data-v-13a78ac6 {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  position: relative;
+  display: inline-block;
+}
+.about-content .title-section .highlight-title.data-v-13a78ac6::after {
+  content: "";
+  position: absolute;
+  left: -8rpx;
+  right: -8rpx;
+  bottom: 4rpx;
+  height: 20rpx;
+  background-color: rgba(255, 218, 0, 0.4);
+  z-index: 1;
+}
+.about-content .intro-text.data-v-13a78ac6 {
+  font-size: 30rpx;
+  color: #333;
+  line-height: 1.8;
+  text-align: justify;
+  margin-bottom: 60rpx;
+}
+.awards-section.data-v-13a78ac6 {
+  border: 2rpx dashed #eee;
+  border-radius: 24rpx;
+  margin: 30rpx 40rpx;
+}
+.awards-section .awards-image.data-v-13a78ac6 {
+  width: 100%;
+  display: block;
+}

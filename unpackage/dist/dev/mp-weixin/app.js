@@ -28,6 +28,10 @@ if (!Math) {
   "./pages/points/points.js";
   "./pages/points/details.js";
   "./pages/message/message.js";
+  "./pages/agreement/user.js";
+  "./pages/about/about.js";
+  "./pages/agreement/point.js";
+  "./pages/followingList/followingList.js";
 }
 const _sfc_main = {
   onLaunch: function() {

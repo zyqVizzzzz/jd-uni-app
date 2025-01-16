@@ -126,6 +126,11 @@ const _sfc_main = {
         url: "/pages/device/device"
       });
     };
+    const navigateToFollowingList = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/followingList/followingList"
+      });
+    };
     const navigateToContact = () => {
       common_vendor.index.navigateTo({
         url: "/pages/contactCostumer/contactCostumer"
@@ -138,24 +143,26 @@ const _sfc_main = {
     };
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: userInfo.value.avatarUrl || "/static/avatar.jpg",
+        a: userInfo.value.avatarUrl || "/static/avatar.png",
         b: common_vendor.t(userInfo.value.nickname || "未设置昵称"),
         c: common_vendor.t(userInfo.value.bio || ""),
         d: common_vendor.t(userInfo.value.following || 0),
-        e: common_vendor.t(userInfo.value.followers || 0),
-        f: common_vendor.t(userInfo.value.points || 0),
-        g: common_vendor.o(navigateToPoints),
-        h: activeTab.value === "device"
+        e: common_vendor.o(navigateToFollowingList),
+        f: common_vendor.t(userInfo.value.followers || 0),
+        g: common_vendor.o(navigateToFollowingList),
+        h: common_vendor.t(userInfo.value.points || 0),
+        i: common_vendor.o(navigateToPoints),
+        j: activeTab.value === "device"
       }, activeTab.value === "device" ? {} : {}, {
-        i: activeTab.value === "device" ? 1 : "",
-        j: common_vendor.o(($event) => handleTabClick("device")),
-        k: activeTab.value === "medal"
+        k: activeTab.value === "device" ? 1 : "",
+        l: common_vendor.o(($event) => handleTabClick("device")),
+        m: activeTab.value === "medal"
       }, activeTab.value === "medal" ? {} : {}, {
-        l: activeTab.value === "medal" ? 1 : "",
-        m: common_vendor.o(($event) => handleTabClick("medal")),
-        n: activeTab.value === "device"
+        n: activeTab.value === "medal" ? 1 : "",
+        o: common_vendor.o(($event) => handleTabClick("medal")),
+        p: activeTab.value === "device"
       }, activeTab.value === "device" ? {
-        o: common_vendor.f(devicesList.value, (device, index, i0) => {
+        q: common_vendor.f(devicesList.value, (device, index, i0) => {
           return {
             a: common_vendor.t(device.device_name),
             b: device.device_status === "online" ? 1 : "",
@@ -163,21 +170,21 @@ const _sfc_main = {
             d: index
           };
         }),
-        p: common_vendor.o(($event) => navigateToDevice(_ctx.device)),
-        q: common_vendor.o((...args) => _ctx.handleAddDevice && _ctx.handleAddDevice(...args)),
-        r: currentDevice.value,
-        s: common_vendor.o(handleDeviceChange)
+        r: common_vendor.o(($event) => navigateToDevice(_ctx.device)),
+        s: common_vendor.o((...args) => _ctx.handleAddDevice && _ctx.handleAddDevice(...args)),
+        t: currentDevice.value,
+        v: common_vendor.o(handleDeviceChange)
       } : {}, {
-        t: activeTab.value === "medal"
+        w: activeTab.value === "medal"
       }, activeTab.value === "medal" ? {} : {}, {
-        v: common_vendor.o(navigateToAccount),
-        w: common_vendor.o(navigateToMessage),
-        x: common_vendor.o(navigateToContact),
-        y: common_vendor.sr(loginPopupRef, "093d7f73-0", {
+        x: common_vendor.o(navigateToAccount),
+        y: common_vendor.o(navigateToMessage),
+        z: common_vendor.o(navigateToContact),
+        A: common_vendor.sr(loginPopupRef, "093d7f73-0", {
           "k": "loginPopupRef"
         }),
-        z: common_vendor.o(handleLoginSuccess),
-        A: common_vendor.o(handleLoginClose)
+        B: common_vendor.o(handleLoginSuccess),
+        C: common_vendor.o(handleLoginClose)
       });
     };
   }

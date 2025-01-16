@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_require = require("../../utils/require.js");
+const api_userRelations = require("../../api/userRelations.js");
 require("../../config.js");
 if (!Array) {
   const _easycom_uni_popup2 = common_vendor.resolveComponent("uni-popup");
@@ -75,20 +76,54 @@ const _sfc_main = {
           topThree.value = rankings.slice(0, 3).map((item) => ({
             name: item.user_id.nickname,
             avatar: item.user_id.avatarUrl,
+            isFollowing: item.user_id.isFollowing,
             score: ((item.total_distance || 0) / 1e3).toFixed(2),
-            rank: item.rank
+            rank: item.rank,
+            userId: item.user_id._id
           }));
           rankingList.value = rankings.slice(3).map((item) => ({
             name: item.user_id.nickname,
             avatar: item.user_id.avatarUrl,
+            isFollowing: item.user_id.isFollowing,
             distance: ((item.total_distance || 0) / 1e3).toFixed(2),
-            rank: item.rank
+            rank: item.rank,
+            userId: item.user_id._id
           }));
         }
       } catch (error) {
         console.error("获取排行榜失败:", error);
         common_vendor.index.showToast({
           title: "获取排行榜失败",
+          icon: "none"
+        });
+      }
+    };
+    const handleFollow = async (user) => {
+      try {
+        let res;
+        if (!user.isFollowing) {
+          res = await api_userRelations.userRelationsApi.followUser(user.userId);
+        } else {
+          res = await api_userRelations.userRelationsApi.unfollowUser(user.userId);
+        }
+        if (res.data.code === 200 || res.data.code === 201) {
+          topThree.value = topThree.value.map((item) => {
+            if (item.userId === user.userId) {
+              return { ...item, isFollowing: !item.isFollowing };
+            }
+            return item;
+          });
+          rankingList.value = rankingList.value.map((item) => {
+            if (item.userId === user.userId) {
+              return { ...item, isFollowing: !item.isFollowing };
+            }
+            return item;
+          });
+        }
+      } catch (error) {
+        console.error("关注操作失败:", error);
+        common_vendor.index.showToast({
+          title: error.message || "操作失败",
           icon: "none"
         });
       }
@@ -182,13 +217,16 @@ const _sfc_main = {
             c: common_vendor.t(user.rank),
             d: common_vendor.t(user.name),
             e: common_vendor.t(user.score),
-            f: common_vendor.n(user.rank === 1 ? "yellow" : user.rank === 2 ? "orange" : "pink")
+            f: common_vendor.t(user.isFollowing ? "已关注" : "关注"),
+            g: common_vendor.o(($event) => handleFollow(user), index),
+            h: user.isFollowing ? 1 : "",
+            i: common_vendor.n(user.rank === 1 ? "yellow" : user.rank === 2 ? "orange" : "pink")
           } : {
-            g: user.avatar || "/static/avatar-default@3x.png",
-            h: common_vendor.t(index === 0 ? 2 : index === 1 ? 1 : 3),
-            i: common_vendor.n(index === 0 ? "orange" : index === 1 ? "yellow" : "pink")
+            j: user.avatar || "/static/avatar-default@3x.png",
+            k: common_vendor.t(index === 0 ? 2 : index === 1 ? 1 : 3),
+            l: common_vendor.n(index === 0 ? "orange" : index === 1 ? "yellow" : "pink")
           }, {
-            j: index
+            m: index
           });
         }),
         m: rankingList.value.length > 0

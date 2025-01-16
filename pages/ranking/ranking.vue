@@ -91,7 +91,12 @@
 					<text class="name">{{ user.name }}</text>
 					<text class="score">{{ user.score }}</text>
 					<text class="unit">总距离 (千米)</text>
-					<text class="btn-follow">关注</text>
+					<text
+						class="btn-follow"
+						@tap="handleFollow(user)"
+						:class="{ followed: user.isFollowing }"
+						>{{ user.isFollowing ? "已关注" : "关注" }}</text
+					>
 				</view>
 				<view
 					v-else
@@ -156,6 +161,7 @@
 import { ref, onMounted, computed } from "vue";
 import { request } from "@/utils/require";
 import { onShow } from "@dcloudio/uni-app";
+import { userRelationsApi } from "../../api/userRelations.js";
 
 const selectedLocation = ref("national");
 const currentCity = ref("杭州"); // 测试阶段默认设置为杭州
@@ -285,22 +291,63 @@ const fetchRankings = async (tab = "daily") => {
 			topThree.value = rankings.slice(0, 3).map((item) => ({
 				name: item.user_id.nickname,
 				avatar: item.user_id.avatarUrl,
+				isFollowing: item.user_id.isFollowing,
 				score: ((item.total_distance || 0) / 1000).toFixed(2),
 				rank: item.rank,
+				userId: item.user_id._id,
 			}));
 
 			// 处理第4名之后的数据
 			rankingList.value = rankings.slice(3).map((item) => ({
 				name: item.user_id.nickname,
 				avatar: item.user_id.avatarUrl,
+				isFollowing: item.user_id.isFollowing,
 				distance: ((item.total_distance || 0) / 1000).toFixed(2),
 				rank: item.rank,
+				userId: item.user_id._id,
 			}));
 		}
 	} catch (error) {
 		console.error("获取排行榜失败:", error);
 		uni.showToast({
 			title: "获取排行榜失败",
+			icon: "none",
+		});
+	}
+};
+
+// 关注/取消关注
+const handleFollow = async (user) => {
+	try {
+		// 调用关注/取关API
+		let res;
+		if (!user.isFollowing) {
+			res = await userRelationsApi.followUser(user.userId);
+		} else {
+			res = await userRelationsApi.unfollowUser(user.userId);
+		}
+
+		if (res.data.code === 200 || res.data.code === 201) {
+			// 更新排行榜中的关注状态
+			topThree.value = topThree.value.map((item) => {
+				if (item.userId === user.userId) {
+					return { ...item, isFollowing: !item.isFollowing };
+				}
+				return item;
+			});
+
+			// 更新其他排名列表
+			rankingList.value = rankingList.value.map((item) => {
+				if (item.userId === user.userId) {
+					return { ...item, isFollowing: !item.isFollowing };
+				}
+				return item;
+			});
+		}
+	} catch (error) {
+		console.error("关注操作失败:", error);
+		uni.showToast({
+			title: error.message || "操作失败",
 			icon: "none",
 		});
 	}
@@ -570,6 +617,11 @@ onShow(() => {
 	background: #ffd100;
 	border-radius: 4rpx;
 	font-size: 24rpx;
+
+	&.followed {
+		background-color: #f0f0f0;
+		color: #666;
+	}
 }
 
 .followed {

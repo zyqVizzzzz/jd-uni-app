@@ -170,6 +170,10 @@
   border-radius: 4rpx;
   font-size: 24rpx;
 }
+.btn-follow.followed {
+  background-color: #f0f0f0;
+  color: #666;
+}
 .followed {
   color: #ffc300;
   background: #fffae0;

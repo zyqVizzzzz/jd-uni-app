@@ -11,7 +11,7 @@ const _sfc_main = {
   setup(__props) {
     const loginPopupRef = common_vendor.ref(null);
     const latestRecord = common_vendor.ref({});
-    const monthlyStats = common_vendor.ref({});
+    common_vendor.ref({});
     const monthlyTarget = common_vendor.ref({
       currentDistance: 0,
       targetDistance: 2e3,
@@ -57,38 +57,16 @@ const _sfc_main = {
       }
     };
     const fetchMonthlyStats = async () => {
-      const now = /* @__PURE__ */ new Date();
       try {
         const res = await utils_require.request({
-          url: "/swimming/monthly-stats",
-          params: {
-            year: now.getFullYear(),
-            month: now.getMonth() + 1
-          }
+          url: "/swimming/monthly-target"
         });
         if (res.data.code === 200) {
-          console.log(res.data.data);
-          monthlyStats.value = res.data.data[0] || {};
+          monthlyTarget.value = res.data.data || {};
+          console.log(monthlyTarget.value);
         }
       } catch (err) {
         console.error("获取月度统计失败", err);
-      }
-    };
-    const fetchMonthlyTarget = async () => {
-      const now = /* @__PURE__ */ new Date();
-      try {
-        const res = await utils_require.request({
-          url: "/swimming/monthly-target",
-          params: {
-            year: now.getFullYear(),
-            month: now.getMonth() + 1
-          }
-        });
-        if (res.data.code === 200) {
-          monthlyTarget.value = res.data.data;
-        }
-      } catch (err) {
-        console.error("获取月度目标失败", err);
       }
     };
     const totalStats = common_vendor.ref({
@@ -129,7 +107,6 @@ const _sfc_main = {
       await Promise.all([
         fetchLatestRecord(),
         fetchMonthlyStats(),
-        fetchMonthlyTarget(),
         fetchTotalStats()
       ]);
     };
@@ -154,7 +131,6 @@ const _sfc_main = {
         await Promise.all([
           fetchLatestRecord(),
           fetchMonthlyStats(),
-          fetchMonthlyTarget(),
           fetchTotalStats()
         ]);
       });

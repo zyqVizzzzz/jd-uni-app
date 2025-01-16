@@ -1,0 +1,40 @@
+/* 水平间距 */
+/* 水平间距 */
+.rules-page.data-v-a5081bba {
+  min-height: 100vh;
+  padding-top: 30rpx;
+}
+.rules-content.data-v-a5081bba {
+  margin: 0 30rpx 30rpx;
+  padding: 58rpx 32rpx 32rpx;
+  background: #fff;
+  border-radius: 12rpx;
+}
+.rules-content .title.data-v-a5081bba {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 48rpx;
+}
+.rules-content .rules-section .rule-item.data-v-a5081bba {
+  margin-bottom: 40rpx;
+}
+.rules-content .rules-section .rule-item .rule-title.data-v-a5081bba {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+.rules-content .rules-section .rule-item .rule-content.data-v-a5081bba {
+  padding-left: 16rpx;
+}
+.rules-content .rules-section .rule-item .rule-content .sub-rule.data-v-a5081bba {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 16rpx;
+}
+.rules-content .rules-section .rule-item .rule-content .sub-rule.data-v-a5081bba:last-child {
+  margin-bottom: 0;
+}

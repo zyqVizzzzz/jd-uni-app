@@ -5,7 +5,7 @@
 			<!-- 头像和名称 -->
 			<view class="user-profile">
 				<image
-					:src="userInfo.avatarUrl || '/static/avatar.jpg'"
+					:src="userInfo.avatarUrl || '/static/avatar.png'"
 					class="avatar"
 					mode="aspectFill"
 				/>
@@ -15,11 +15,11 @@
 
 			<!-- 数据统计 -->
 			<view class="stats">
-				<view class="stat-item">
+				<view class="stat-item" @tap="navigateToFollowingList">
 					<text class="stat-num">{{ userInfo.following || 0 }}</text>
 					<text class="stat-label">关注</text>
 				</view>
-				<view class="stat-item">
+				<view class="stat-item" @tap="navigateToFollowingList">
 					<text class="stat-num">{{ userInfo.followers || 0 }}</text>
 					<text class="stat-label">粉丝</text>
 				</view>
@@ -282,6 +282,12 @@ const navigateToPoints = () => {
 const navigateToDevice = () => {
 	uni.navigateTo({
 		url: "/pages/device/device",
+	});
+};
+
+const navigateToFollowingList = () => {
+	uni.navigateTo({
+		url: "/pages/followingList/followingList",
 	});
 };
 

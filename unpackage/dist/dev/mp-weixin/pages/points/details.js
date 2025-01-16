@@ -55,6 +55,11 @@ const _sfc_main = {
       const seconds = String(date.getSeconds()).padStart(2, "0");
       return `${year}.${month}.${day} ${hours}:${minutes}:${seconds}`;
     };
+    const navigateToRules = () => {
+      common_vendor.index.navigateTo({
+        url: "/pages/agreement/point"
+      });
+    };
     common_vendor.onMounted(() => {
       fetchPointsList();
     });
@@ -66,8 +71,9 @@ const _sfc_main = {
     });
     return (_ctx, _cache) => {
       return {
-        a: common_vendor.t(points.value),
-        b: common_vendor.f(pointsList.value, (item, index, i0) => {
+        a: common_vendor.o(navigateToRules),
+        b: common_vendor.t(points.value),
+        c: common_vendor.f(pointsList.value, (item, index, i0) => {
           return {
             a: common_vendor.t(item.title),
             b: common_vendor.t(item.time),

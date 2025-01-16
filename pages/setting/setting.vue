@@ -4,7 +4,7 @@
 			<view class="list-item profile">
 				<text class="label">编辑个人资料</text>
 				<image
-					:src="userInfo.avatarUrl || '/static/avatar.jpg'"
+					:src="userInfo.avatarUrl || '/static/avatar.png'"
 					class="avatar"
 					mode="aspectFill"
 				/>
@@ -12,7 +12,7 @@
 		</view>
 
 		<view class="section">
-			<view class="list-item">
+			<view class="list-item" @tap="navigateToAbout">
 				<text class="label">关于我们</text>
 			</view>
 			<view class="list-item">
@@ -64,6 +64,12 @@ onShow(() => {
 const navigateToProfile = () => {
 	uni.navigateTo({
 		url: "/pages/profile/profile",
+	});
+};
+
+const navigateToAbout = () => {
+	uni.navigateTo({
+		url: "/pages/about/about",
 	});
 };
 </script>
