@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_userRelations = require("../../api/userRelations.js");
 const api_points = require("../../api/points.js");
+const api_moments = require("../../api/moments.js");
 const utils_require = require("../../utils/require.js");
 require("../../config.js");
 const _sfc_main = {
@@ -97,36 +98,129 @@ const _sfc_main = {
       }
     });
     const fetchTabContent = async () => {
+      if (activeTab.value === "dynamics") {
+        await fetchDynamics();
+      }
+    };
+    const fetchDynamics = async () => {
       if (isLoading.value)
         return;
       isLoading.value = true;
       try {
-        const endpoint = activeTab.value === "dynamics" ? `/dynamics/${userId.value}` : `/badges/${userId.value}`;
-        const res = await utils_require.request({
-          url: endpoint,
-          data: {
-            page: page.value,
-            pageSize: pageSize.value
-          }
-        });
-        if (res.statusCode === 200) {
-          const list = activeTab.value === "dynamics" ? dynamicsList : badgesList;
+        const params = {
+          page: page.value,
+          limit: pageSize.value
+        };
+        const res = await api_moments.momentApi.getMoments(params);
+        const currentUserId = JSON.parse(common_vendor.index.getStorageSync("userInfo"))._id;
+        if (res.data.code === 200) {
+          const formattedPosts = res.data.data.items.map((item) => {
+            var _a, _b;
+            return {
+              id: item._id,
+              content: item.content,
+              createTime: new Date(item.createdAt).toLocaleDateString("zh-CN"),
+              images: item.images || [],
+              isLiked: (_a = item.likedBy) == null ? void 0 : _a.includes(currentUserId),
+              likes: item.likeCount,
+              comments: item.commentCount,
+              shares: 0,
+              sportData: (_b = item.metadata) == null ? void 0 : _b.sportData
+            };
+          });
           if (page.value === 1) {
-            list.value = res.data;
+            dynamicsList.value = formattedPosts;
           } else {
-            list.value = [...list.value, ...res.data];
+            dynamicsList.value = [...dynamicsList.value, ...formattedPosts];
           }
+          page.value++;
         }
       } catch (error) {
-        console.error("获取内容失败:", error);
+        console.error("获取动态列表失败:", error);
         common_vendor.index.showToast({
-          title: "获取内容失败",
+          title: "获取动态列表失败",
           icon: "none"
         });
       } finally {
         isLoading.value = false;
         isRefreshing.value = false;
       }
+    };
+    const handleLike = async (post) => {
+      try {
+        const res = await api_moments.momentApi.likeMoment(post.id);
+        if (res.data.code === 201) {
+          const { liked } = res.data.data;
+          dynamicsList.value = dynamicsList.value.map((p) => {
+            if (p.id === post.id) {
+              return {
+                ...p,
+                likes: p.likes + (liked ? 1 : -1),
+                isLiked: liked
+              };
+            }
+            return p;
+          });
+        }
+      } catch (error) {
+        console.error("点赞操作失败:", error);
+        common_vendor.index.showToast({
+          title: error.message || "操作失败",
+          icon: "none"
+        });
+      }
+    };
+    const handleShare = (post) => {
+      common_vendor.index.showShareMenu({
+        withShareTicket: true,
+        menus: ["shareAppMessage", "shareTimeline"]
+      });
+    };
+    const previewImage = (images, index) => {
+      common_vendor.index.previewImage({
+        current: index,
+        urls: images
+      });
+    };
+    const navigateToDetail = (postId) => {
+      common_vendor.index.navigateTo({
+        url: `/pages/swimmerDetail/swimmerDetail?id=${postId}`
+      });
+    };
+    const handleMore = (post) => {
+      const currentUserId = JSON.parse(common_vendor.index.getStorageSync("userInfo"))._id;
+      const isOwnPost = post.authorId === currentUserId;
+      const itemList = isOwnPost ? ["删除"] : ["举报"];
+      common_vendor.index.showActionSheet({
+        itemList,
+        success: async function(res) {
+          if (isOwnPost && res.tapIndex === 0) {
+            try {
+              const res2 = await api_moments.momentApi.deleteMoment(post.id);
+              if (res2.data.code === 200) {
+                dynamicsList.value = dynamicsList.value.filter(
+                  (p) => p.id !== post.id
+                );
+                common_vendor.index.showToast({
+                  title: "删除成功",
+                  icon: "success"
+                });
+              }
+            } catch (error) {
+              console.error("删除动态失败:", error);
+              common_vendor.index.showToast({
+                title: "删除失败",
+                icon: "none"
+              });
+            }
+          } else if (!isOwnPost && res.tapIndex === 0) {
+            common_vendor.index.showToast({
+              title: "举报成功",
+              icon: "success"
+            });
+          }
+        }
+      });
     };
     const handleFollow = async () => {
       try {
@@ -191,27 +285,60 @@ const _sfc_main = {
       }, activeTab.value === "dynamics" ? common_vendor.e({
         s: dynamicsList.value.length > 0
       }, dynamicsList.value.length > 0 ? {
-        t: common_vendor.f(dynamicsList.value, (item, index, i0) => {
-          return {
-            a: index
-          };
-        })
+        t: common_vendor.f(dynamicsList.value, (post, index, i0) => {
+          return common_vendor.e({
+            a: common_vendor.t(post.createTime),
+            b: common_vendor.t(post.content),
+            c: post.images && post.images.length > 0
+          }, post.images && post.images.length > 0 ? {
+            d: common_vendor.f(post.images, (image, imageIndex, i1) => {
+              return {
+                a: image,
+                b: imageIndex,
+                c: common_vendor.o(($event) => previewImage(post.images, imageIndex), imageIndex)
+              };
+            }),
+            e: common_vendor.n(post.images.length === 1 ? "single-image" : ""),
+            f: common_vendor.n(post.images.length === 4 ? "four-grid" : ""),
+            g: common_vendor.n(post.images.length > 4 ? "multi-grid" : "")
+          } : {}, {
+            h: post.sportData
+          }, post.sportData ? {
+            i: common_vendor.t(post.sportData.distance),
+            j: common_vendor.t(post.sportData.duration),
+            k: common_vendor.t(post.sportData.pace),
+            l: common_vendor.t(post.sportData.calories)
+          } : {}, {
+            m: common_vendor.o(($event) => navigateToDetail(post.id), index),
+            n: post.isLiked ? "/static/icons/moments-like-active.png" : "/static/icons/moments-like.png",
+            o: common_vendor.t(post.likes),
+            p: common_vendor.o(($event) => handleLike(post), index),
+            q: common_vendor.t(post.comments),
+            r: common_vendor.o(($event) => navigateToDetail(post.id), index),
+            s: common_vendor.t(post.shares),
+            t: common_vendor.o(($event) => handleShare(), index),
+            v: common_vendor.o(($event) => handleMore(post), index),
+            w: index
+          });
+        }),
+        v: userInfo.value.avatar || "/static/avatar.png",
+        w: common_vendor.t(userInfo.value.nickname)
       } : {}) : {}, {
-        v: activeTab.value === "badges"
+        x: activeTab.value === "badges"
       }, activeTab.value === "badges" ? common_vendor.e({
-        w: badgesList.value.length > 0
+        y: badgesList.value.length > 0
       }, badgesList.value.length > 0 ? {
-        x: common_vendor.f(badgesList.value, (badge, index, i0) => {
+        z: common_vendor.f(badgesList.value, (badge, index, i0) => {
           return {
             a: index
           };
         })
       } : {}) : {}, {
-        y: isLoading.value
+        A: isLoading.value
       }, isLoading.value ? {} : {}, {
-        z: common_vendor.o(loadMore),
-        A: isRefreshing.value,
-        B: common_vendor.o(onRefresh)
+        B: common_vendor.o(loadMore),
+        C: isRefreshing.value,
+        D: common_vendor.o(onRefresh)
       });
     };
   }

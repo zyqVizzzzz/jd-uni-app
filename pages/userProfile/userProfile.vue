@@ -75,11 +75,109 @@
 			<block v-if="activeTab === 'dynamics'">
 				<view v-if="dynamicsList.length > 0" class="dynamics-list">
 					<view
-						v-for="(item, index) in dynamicsList"
+						v-for="(post, index) in dynamicsList"
 						:key="index"
 						class="dynamic-item"
 					>
+						<!-- 用户信息 -->
+						<view class="user-info">
+							<image
+								class="avatar"
+								:src="userInfo.avatar || '/static/avatar.png'"
+								mode="aspectFill"
+							/>
+							<view class="user-detail">
+								<text class="username">{{ userInfo.nickname }}</text>
+								<text class="post-time">{{ post.createTime }}</text>
+							</view>
+						</view>
 						<!-- 动态内容 -->
+						<view class="post-content" @tap="navigateToDetail(post.id)">
+							<text class="post-text">{{ post.content }}</text>
+							<!-- 图片网格 -->
+							<view
+								class="image-grid"
+								v-if="post.images && post.images.length > 0"
+							>
+								<view
+									class="image-grid-item"
+									:class="[
+										post.images.length === 1 ? 'single-image' : '',
+										post.images.length === 4 ? 'four-grid' : '',
+										post.images.length > 4 ? 'multi-grid' : '',
+									]"
+									v-for="(image, imageIndex) in post.images"
+									:key="imageIndex"
+									@tap.stop="previewImage(post.images, imageIndex)"
+								>
+									<image class="grid-image" :src="image" mode="aspectFill" />
+								</view>
+							</view>
+							<!-- 运动数据卡片 -->
+							<view v-if="post.sportData" class="sport-data">
+								<view class="data-item">
+									<text class="data-value">{{ post.sportData.distance }}M</text>
+									<text class="data-label">距离</text>
+								</view>
+								<view class="data-item">
+									<text class="data-value">{{ post.sportData.duration }}</text>
+									<text class="data-label">时间</text>
+								</view>
+								<view class="data-item">
+									<text class="data-value">{{ post.sportData.pace }}</text>
+									<text class="data-label">平均百米配速</text>
+								</view>
+								<view class="data-item">
+									<text class="data-value"
+										>{{ post.sportData.calories }} KCAL</text
+									>
+									<text class="data-label">消耗热量</text>
+								</view>
+							</view>
+						</view>
+						<!-- 互动区域 -->
+						<view class="interaction-bar">
+							<!-- 左侧互动按钮组 -->
+							<view class="left-actions">
+								<view class="action-item" @tap="handleLike(post)">
+									<image
+										class="action-icon"
+										:src="
+											post.isLiked
+												? '/static/icons/moments-like-active.png'
+												: '/static/icons/moments-like.png'
+										"
+										mode="aspectFit"
+									/>
+									<text class="count">{{ post.likes }}</text>
+								</view>
+								<view class="action-item" @tap="navigateToDetail(post.id)">
+									<image
+										class="action-icon"
+										src="/static/icons/moments-comments.png"
+										mode="aspectFit"
+									/>
+									<text class="count">{{ post.comments }}</text>
+								</view>
+								<view class="action-item" @tap="handleShare(post)">
+									<image
+										class="action-icon"
+										src="/static/icons/moments-share.png"
+										mode="aspectFit"
+									/>
+									<text class="count">{{ post.shares }}</text>
+								</view>
+							</view>
+
+							<!-- 右侧更多按钮 -->
+							<view class="action-item more-btn" @tap="handleMore(post)">
+								<image
+									class="action-icon"
+									src="/static/icons/moments-more.png"
+									mode="aspectFit"
+								/>
+							</view>
+						</view>
 					</view>
 				</view>
 				<view v-else class="empty-state">
@@ -115,6 +213,7 @@
 import { ref, onMounted } from "vue";
 import { userRelationsApi } from "@/api/userRelations";
 import { pointApi } from "@/api/points";
+import { momentApi } from "@/api/moments.js"; // 确保路径正确
 
 import { request } from "@/utils/require";
 import { onLoad, onHide } from "@dcloudio/uni-app";
@@ -224,42 +323,148 @@ onLoad((options) => {
 
 // 获取标签页内容
 const fetchTabContent = async () => {
+	if (activeTab.value === "dynamics") {
+		await fetchDynamics();
+	} else {
+		// 原有的徽章获取逻辑
+	}
+};
+
+// 获取动态列表
+const fetchDynamics = async () => {
 	if (isLoading.value) return;
 
 	isLoading.value = true;
 	try {
-		const endpoint =
-			activeTab.value === "dynamics"
-				? `/dynamics/${userId.value}`
-				: `/badges/${userId.value}`;
+		const params = {
+			page: page.value,
+			limit: pageSize.value,
+		};
 
-		const res = await request({
-			url: endpoint,
-			data: {
-				page: page.value,
-				pageSize: pageSize.value,
-			},
-		});
+		const res = await momentApi.getMoments(params);
+		const currentUserId = JSON.parse(uni.getStorageSync("userInfo"))._id;
 
-		if (res.statusCode === 200) {
-			const list = activeTab.value === "dynamics" ? dynamicsList : badgesList;
+		if (res.data.code === 200) {
+			const formattedPosts = res.data.data.items.map((item) => ({
+				id: item._id,
+				content: item.content,
+				createTime: new Date(item.createdAt).toLocaleDateString("zh-CN"),
+				images: item.images || [],
+				isLiked: item.likedBy?.includes(currentUserId),
+				likes: item.likeCount,
+				comments: item.commentCount,
+				shares: 0,
+				sportData: item.metadata?.sportData,
+			}));
 
 			if (page.value === 1) {
-				list.value = res.data;
+				dynamicsList.value = formattedPosts;
 			} else {
-				list.value = [...list.value, ...res.data];
+				dynamicsList.value = [...dynamicsList.value, ...formattedPosts];
 			}
+
+			page.value++;
 		}
 	} catch (error) {
-		console.error("获取内容失败:", error);
+		console.error("获取动态列表失败:", error);
 		uni.showToast({
-			title: "获取内容失败",
+			title: "获取动态列表失败",
 			icon: "none",
 		});
 	} finally {
 		isLoading.value = false;
 		isRefreshing.value = false;
 	}
+};
+
+// 点赞
+const handleLike = async (post) => {
+	try {
+		const res = await momentApi.likeMoment(post.id);
+		if (res.data.code === 201) {
+			const { liked } = res.data.data;
+			dynamicsList.value = dynamicsList.value.map((p) => {
+				if (p.id === post.id) {
+					return {
+						...p,
+						likes: p.likes + (liked ? 1 : -1),
+						isLiked: liked,
+					};
+				}
+				return p;
+			});
+		}
+	} catch (error) {
+		console.error("点赞操作失败:", error);
+		uni.showToast({
+			title: error.message || "操作失败",
+			icon: "none",
+		});
+	}
+};
+
+// 分享
+const handleShare = (post) => {
+	uni.showShareMenu({
+		withShareTicket: true,
+		menus: ["shareAppMessage", "shareTimeline"],
+	});
+};
+
+// 预览图片
+const previewImage = (images, index) => {
+	uni.previewImage({
+		current: index,
+		urls: images,
+	});
+};
+
+// 跳转到动态详情
+const navigateToDetail = (postId) => {
+	uni.navigateTo({
+		url: `/pages/swimmerDetail/swimmerDetail?id=${postId}`,
+	});
+};
+
+// 处理更多按钮点击
+const handleMore = (post) => {
+	const currentUserId = JSON.parse(uni.getStorageSync("userInfo"))._id;
+	const isOwnPost = post.authorId === currentUserId;
+
+	const itemList = isOwnPost ? ["删除"] : ["举报"];
+
+	uni.showActionSheet({
+		itemList,
+		success: async function (res) {
+			if (isOwnPost && res.tapIndex === 0) {
+				// 删除动态
+				try {
+					const res = await momentApi.deleteMoment(post.id);
+					if (res.data.code === 200) {
+						dynamicsList.value = dynamicsList.value.filter(
+							(p) => p.id !== post.id
+						);
+						uni.showToast({
+							title: "删除成功",
+							icon: "success",
+						});
+					}
+				} catch (error) {
+					console.error("删除动态失败:", error);
+					uni.showToast({
+						title: "删除失败",
+						icon: "none",
+					});
+				}
+			} else if (!isOwnPost && res.tapIndex === 0) {
+				// 举报
+				uni.showToast({
+					title: "举报成功",
+					icon: "success",
+				});
+			}
+		},
+	});
 };
 
 // 关注/取消关注
@@ -452,9 +657,139 @@ onMounted(() => {
 	background: #ffffff;
 }
 
+.dynamics-list {
+	padding: 20rpx;
+
+	.user-info {
+		display: flex;
+		align-items: center;
+		padding-bottom: 10rpx;
+
+		.avatar {
+			width: 80rpx;
+			height: 80rpx;
+			border-radius: 50%;
+			margin-right: 20rpx;
+		}
+
+		.user-detail {
+			flex: 1;
+
+			.username {
+				font-size: 28rpx;
+				font-weight: 500;
+				color: #333;
+				display: block;
+				margin-bottom: 0;
+			}
+
+			.post-time {
+				font-size: 24rpx;
+				color: #999;
+				margin-top: 4rpx;
+				display: block;
+			}
+		}
+	}
+
+	.dynamic-item {
+		background: #fff;
+		border-radius: 12rpx;
+		padding: 20rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.post-content {
+		margin: 20rpx 0;
+	}
+
+	.post-text {
+		font-size: 28rpx;
+		color: #333;
+		line-height: 1.6;
+	}
+
+	.image-grid {
+		margin-top: 20rpx;
+		display: grid;
+		grid-gap: 10rpx;
+		grid-template-columns: repeat(3, 1fr);
+
+		&-item {
+			aspect-ratio: 1;
+			overflow: hidden;
+			border-radius: 8rpx;
+
+			&.single-image {
+				grid-column: span 2;
+			}
+
+			.grid-image {
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+
+	.sport-data {
+		margin-top: 20rpx;
+		background: #f8f8f8;
+		border-radius: 12rpx;
+		padding: 20rpx;
+		display: flex;
+		justify-content: space-between;
+
+		.data-item {
+			text-align: center;
+
+			.data-value {
+				font-size: 32rpx;
+				font-weight: 500;
+				color: #333;
+				display: block;
+			}
+
+			.data-label {
+				font-size: 24rpx;
+				color: #666;
+				margin-top: 8rpx;
+				display: block;
+			}
+		}
+	}
+
+	.interaction-bar {
+		margin-top: 20rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.left-actions {
+			display: flex;
+			gap: 40rpx;
+		}
+
+		.action-item {
+			display: flex;
+			align-items: center;
+			gap: 8rpx;
+
+			.action-icon {
+				width: 40rpx;
+				height: 40rpx;
+			}
+
+			.count {
+				font-size: 24rpx;
+				color: #666;
+			}
+		}
+	}
+}
+
 .empty-state {
-	padding: 120rpx 0;
 	text-align: center;
+	padding: 40rpx;
 	color: #999;
 	font-size: 28rpx;
 }

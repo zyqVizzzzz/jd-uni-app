@@ -120,9 +120,117 @@
   flex: 1;
   background: #ffffff;
 }
-.empty-state {
-  padding: 120rpx 0;
+.dynamics-list {
+  padding: 20rpx;
+}
+.dynamics-list .user-info {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10rpx;
+}
+.dynamics-list .user-info .avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+.dynamics-list .user-info .user-detail {
+  flex: 1;
+}
+.dynamics-list .user-info .user-detail .username {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  display: block;
+  margin-bottom: 0;
+}
+.dynamics-list .user-info .user-detail .post-time {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 4rpx;
+  display: block;
+}
+.dynamics-list .dynamic-item {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+.dynamics-list .post-content {
+  margin: 20rpx 0;
+}
+.dynamics-list .post-text {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+}
+.dynamics-list .image-grid {
+  margin-top: 20rpx;
+  display: grid;
+  grid-gap: 10rpx;
+  grid-template-columns: repeat(3, 1fr);
+}
+.dynamics-list .image-grid-item {
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8rpx;
+}
+.dynamics-list .image-grid-item.single-image {
+  grid-column: span 2;
+}
+.dynamics-list .image-grid-item .grid-image {
+  width: 100%;
+  height: 100%;
+}
+.dynamics-list .sport-data {
+  margin-top: 20rpx;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  display: flex;
+  justify-content: space-between;
+}
+.dynamics-list .sport-data .data-item {
   text-align: center;
+}
+.dynamics-list .sport-data .data-item .data-value {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+  display: block;
+}
+.dynamics-list .sport-data .data-item .data-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 8rpx;
+  display: block;
+}
+.dynamics-list .interaction-bar {
+  margin-top: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dynamics-list .interaction-bar .left-actions {
+  display: flex;
+  gap: 40rpx;
+}
+.dynamics-list .interaction-bar .action-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+.dynamics-list .interaction-bar .action-item .action-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+.dynamics-list .interaction-bar .action-item .count {
+  font-size: 24rpx;
+  color: #666;
+}
+.empty-state {
+  text-align: center;
+  padding: 40rpx;
   color: #999;
   font-size: 28rpx;
 }
