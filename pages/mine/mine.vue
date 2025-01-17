@@ -25,7 +25,7 @@
 				</view>
 				<view class="stat-item">
 					<text class="stat-num" @tap="navigateToPoints">{{
-						userInfo.points || 0
+						points || 0
 					}}</text>
 					<text class="stat-label">积分</text>
 				</view>
@@ -140,6 +140,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { request } from "@/utils/require";
+import { pointApi } from "@/api/points";
 import LoginPopup from "@/components/LoginPopup.vue";
 import { onShow } from "@dcloudio/uni-app";
 import emitter from "@/utils/eventBus";
@@ -173,12 +174,14 @@ onMounted(() => {
 	}
 	checkLoginStatus(() => {
 		fetchUserInfo();
+		fetchPoints();
 		fetchUserDevices();
 	});
 
 	emitter.on("updateUserInfo", () => {
 		console.log("收到更新事件");
 		fetchUserInfo();
+		fetchPoints();
 		fetchUserDevices();
 	});
 });
@@ -195,6 +198,7 @@ onShow(() => {
 	}
 	checkLoginStatus(() => {
 		fetchUserInfo();
+		fetchPoints();
 		fetchUserDevices();
 	});
 });
@@ -226,6 +230,17 @@ const fetchUserInfo = async () => {
 			icon: "none",
 		});
 	}
+};
+
+const points = ref(0);
+const fetchPoints = async () => {
+	try {
+		const res = await pointApi.getUserPoints();
+		if (res.data.code === 200) {
+			// 更新任务状态
+			points.value = res.data.data.totalPoints;
+		}
+	} catch (error) {}
 };
 
 const fetchUserDevices = async () => {

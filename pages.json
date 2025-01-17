@@ -201,6 +201,13 @@
 			}
 		},
 		{
+			"path": "pages/userProfile/userProfile",
+			"style": {
+				"navigationBarTitleText": "个人主页",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
 			"path": "pages/followingList/followingList",
 			"style": {
 				"navigationBarTitleText": "关注列表",

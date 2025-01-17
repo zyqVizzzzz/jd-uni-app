@@ -29,6 +29,7 @@
     "pages/agreement/user",
     "pages/about/about",
     "pages/agreement/point",
+    "pages/userProfile/userProfile",
     "pages/followingList/followingList"
   ],
   "window": {

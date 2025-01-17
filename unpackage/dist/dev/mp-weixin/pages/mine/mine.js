@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_require = require("../../utils/require.js");
+const api_points = require("../../api/points.js");
 const utils_eventBus = require("../../utils/eventBus.js");
 require("../../config.js");
 if (!Math) {
@@ -36,11 +37,13 @@ const _sfc_main = {
       }
       checkLoginStatus(() => {
         fetchUserInfo();
+        fetchPoints();
         fetchUserDevices();
       });
       utils_eventBus.emitter.on("updateUserInfo", () => {
         console.log("收到更新事件");
         fetchUserInfo();
+        fetchPoints();
         fetchUserDevices();
       });
     });
@@ -55,6 +58,7 @@ const _sfc_main = {
       }
       checkLoginStatus(() => {
         fetchUserInfo();
+        fetchPoints();
         fetchUserDevices();
       });
     });
@@ -81,6 +85,16 @@ const _sfc_main = {
           title: "获取用户信息失败",
           icon: "none"
         });
+      }
+    };
+    const points = common_vendor.ref(0);
+    const fetchPoints = async () => {
+      try {
+        const res = await api_points.pointApi.getUserPoints();
+        if (res.data.code === 200) {
+          points.value = res.data.data.totalPoints;
+        }
+      } catch (error) {
       }
     };
     const fetchUserDevices = async () => {
@@ -150,7 +164,7 @@ const _sfc_main = {
         e: common_vendor.o(navigateToFollowingList),
         f: common_vendor.t(userInfo.value.followers || 0),
         g: common_vendor.o(navigateToFollowingList),
-        h: common_vendor.t(userInfo.value.points || 0),
+        h: common_vendor.t(points.value || 0),
         i: common_vendor.o(navigateToPoints),
         j: activeTab.value === "device"
       }, activeTab.value === "device" ? {} : {}, {

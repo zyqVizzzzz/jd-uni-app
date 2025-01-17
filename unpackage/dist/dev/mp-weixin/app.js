@@ -31,6 +31,7 @@ if (!Math) {
   "./pages/agreement/user.js";
   "./pages/about/about.js";
   "./pages/agreement/point.js";
+  "./pages/userProfile/userProfile.js";
   "./pages/followingList/followingList.js";
 }
 const _sfc_main = {

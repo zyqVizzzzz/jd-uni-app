@@ -20,6 +20,24 @@
 			</view>
 		</view>
 
+		<!-- 搜索框 -->
+		<!-- <view class="search-box">
+			<view class="search-input-wrap">
+				<input
+					type="text"
+					class="search-input"
+					v-model="searchKeyword"
+					placeholder="搜索"
+					placeholder-class="search-placeholder"
+					confirm-type="search"
+					@confirm="handleSearch"
+				/>
+				<view class="search-clear" v-if="searchKeyword" @tap="clearSearch">
+					<text class="clear-icon">×</text>
+				</view>
+			</view>
+		</view> -->
+
 		<!-- 用户列表 -->
 		<scroll-view
 			scroll-y
@@ -29,8 +47,12 @@
 			:refresher-triggered="isRefreshing"
 			@refresherrefresh="onRefresh"
 		>
-			<view v-if="list.length > 0">
-				<view v-for="(user, index) in list" :key="index" class="user-item">
+			<view v-if="filteredList.length > 0">
+				<view
+					v-for="(user, index) in filteredList"
+					:key="index"
+					class="user-item"
+				>
 					<view class="user-info" @tap="navigateToUserProfile(user.id)">
 						<image
 							:src="user.avatarUrl || '/static/avatar.png'"
@@ -39,11 +61,11 @@
 						/>
 						<view class="user-detail">
 							<text class="nickname">{{ user.nickname || "未设置昵称" }}</text>
-							<text class="bio">{{ user.bio || "这个人很懒，没有签名" }}</text>
 						</view>
 					</view>
 					<view
 						class="action-btn"
+						:class="{ 'btn-following': user.isFollowing }"
 						@tap="handleFollow(user)"
 						v-if="activeTab === 'following'"
 					>
@@ -63,7 +85,7 @@
 			</view>
 
 			<!-- 加载状态 -->
-			<view class="loading-state" v-if="isLoading && list.length > 0">
+			<view class="loading-state" v-if="isLoading && filteredList.length > 0">
 				<text class="loading-text">加载中...</text>
 			</view>
 		</scroll-view>
@@ -71,81 +93,52 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { userRelationsApi } from "../../api/userRelations.js";
+import { ref, computed, onMounted } from "vue";
 import { request } from "@/utils/require";
+import { userRelationsApi } from "@/api/userRelations.js";
 
 const activeTab = ref("following");
-// 模拟数据
-const mockFollowingList = [
-	{
-		id: "1",
-		nickname: "游泳达人",
-		avatarUrl: "/static/avatar.png",
-		bio: "游泳爱好者，每周游3次",
-		isFollowing: true,
-	},
-	{
-		id: "2",
-		nickname: "自由泳教练",
-		avatarUrl: "/static/avatar.png",
-		bio: "专业教练，8年教学经验",
-		isFollowing: true,
-	},
-	{
-		id: "3",
-		nickname: "蛙泳小王子",
-		avatarUrl: "/static/avatar.png",
-		bio: "最爱蛙泳，比赛获奖多次",
-		isFollowing: true,
-	},
-];
-
-const mockFollowersList = [
-	{
-		id: "4",
-		nickname: "游泳初学者",
-		avatarUrl: "/static/avatar.png",
-		bio: "刚开始学习游泳，请多指教",
-		isFollowing: false,
-	},
-	{
-		id: "5",
-		nickname: "泳池常客",
-		avatarUrl: "/static/avatar.png",
-		bio: "每天都来游泳",
-		isFollowing: true,
-	},
-];
-
+const searchKeyword = ref("");
 const list = ref([]);
 const page = ref(1);
 const pageSize = ref(20);
 const isLoading = ref(false);
 const isRefreshing = ref(false);
-const hasMore = ref(false); // 由于是假数据，默认没有更多
+const hasMore = ref(true);
+
+// 搜索过滤后的列表
+const filteredList = computed(() => {
+	if (!searchKeyword.value) return list.value;
+	return list.value.filter((user) =>
+		user.nickname.toLowerCase().includes(searchKeyword.value.toLowerCase())
+	);
+});
 
 // 切换标签
 const switchTab = (tab) => {
 	activeTab.value = tab;
+	page.value = 1;
+	list.value = [];
 	fetchUserList();
 };
 
 // 获取用户列表
 const fetchUserList = async () => {
-	if (isLoading.value) return;
+	if (isLoading.value || (!hasMore.value && page.value > 1)) return;
 
 	isLoading.value = true;
 	try {
-		// 根据当前标签请求不同的接口
 		const endpoint = `/user-relations/${activeTab.value}`;
 		const res = await request({
 			url: endpoint,
+			data: {
+				page: page.value,
+				pageSize: pageSize.value,
+			},
 		});
 
-		if (res.data.code === 200) {
-			// 处理返回的数据,从关系对象中提取用户信息
-			list.value = res.data.data.map((item) => {
+		if (res.statusCode === 200) {
+			const newList = res.data.data.map((item) => {
 				const user =
 					activeTab.value === "following" ? item.toUser : item.fromUser;
 				return {
@@ -153,14 +146,23 @@ const fetchUserList = async () => {
 					nickname: user.nickname,
 					avatarUrl: user.avatarUrl,
 					bio: user.bio,
-					isFollowing: true, // following列表中都是已关注的
+					isFollowing: true,
 				};
 			});
+
+			if (page.value === 1) {
+				list.value = newList;
+			} else {
+				list.value = [...list.value, ...newList];
+			}
+
+			hasMore.value = newList.length === pageSize.value;
+			page.value += 1;
 		}
 	} catch (error) {
 		console.error("获取用户列表失败:", error);
 		uni.showToast({
-			title: "获取用户列表失败",
+			title: "获取列表失败",
 			icon: "none",
 		});
 	} finally {
@@ -169,15 +171,25 @@ const fetchUserList = async () => {
 	}
 };
 
+// 搜索处理
+const handleSearch = () => {
+	page.value = 1;
+	fetchUserList();
+};
+
 // 下拉刷新
 const onRefresh = () => {
 	isRefreshing.value = true;
+	page.value = 1;
+	hasMore.value = true;
 	fetchUserList();
 };
 
 // 加载更多
 const loadMore = () => {
-	fetchUserList();
+	if (hasMore.value) {
+		fetchUserList();
+	}
 };
 
 // 关注/取消关注操作
@@ -226,28 +238,30 @@ onMounted(() => {
 <style lang="scss">
 .page {
 	min-height: 100vh;
-	background-color: #f5f5f5;
+	background-color: #fff;
 }
 
 .tabs {
 	display: flex;
+	justify-content: center;
 	background-color: #fff;
-	padding: 0 32rpx;
-	border-bottom: 1rpx solid #eee;
 	position: sticky;
 	top: 0;
 	z-index: 1;
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.02);
 }
 
 .tab-item {
 	position: relative;
-	padding: 24rpx 32rpx;
-	font-size: 32rpx;
-	color: #999;
+	padding: 28rpx 40rpx;
+	margin: 0 20rpx;
+	font-size: 30rpx;
+	color: #666;
+	transition: all 0.3s;
 
 	&.active {
 		color: #333;
-		font-weight: 500;
+		font-weight: 600;
 	}
 }
 
@@ -257,13 +271,38 @@ onMounted(() => {
 	left: 50%;
 	transform: translateX(-50%);
 	width: 48rpx;
-	height: 4rpx;
-	background-color: #ffc107;
-	border-radius: 2rpx;
+	height: 6rpx;
+	background-color: #333;
+	border-radius: 4rpx;
+	transition: all 0.3s ease;
+}
+
+.search-box {
+	padding: 20rpx 32rpx;
+	background-color: #fff;
+}
+
+.search-input-wrap {
+	background-color: #f5f5f5;
+	border-radius: 36rpx;
+	height: 72rpx;
+}
+
+.search-input {
+	width: 100%;
+	height: 72rpx;
+	font-size: 28rpx;
+	color: #333;
+	text-align: center;
+}
+
+.search-placeholder {
+	color: #999;
+	text-align: center;
 }
 
 .user-list {
-	height: calc(100vh - 82rpx); // 减去 tabs 的高度
+	height: calc(100vh - 180rpx); // 减去 tabs 和 search-box 的高度
 }
 
 .user-item {
@@ -307,6 +346,10 @@ onMounted(() => {
 	padding: 12rpx 32rpx;
 	border-radius: 32rpx;
 	background-color: #ffc107;
+
+	&.btn-following {
+		background-color: #f5f5f5;
+	}
 
 	.btn-text {
 		font-size: 28rpx;
