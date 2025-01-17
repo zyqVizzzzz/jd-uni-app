@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const utils_require = require("../../utils/require.js");
 const api_userRelations = require("../../api/userRelations.js");
+const utils_eventBus = require("../../utils/eventBus.js");
 require("../../config.js");
 const _sfc_main = {
   __name: "followingList",
@@ -28,6 +29,7 @@ const _sfc_main = {
       fetchUserList();
     };
     const fetchUserList = async () => {
+      console.log(activeTab.value);
       if (isLoading.value || !hasMore.value && page.value > 1)
         return;
       isLoading.value = true;
@@ -112,6 +114,10 @@ const _sfc_main = {
     };
     common_vendor.onMounted(() => {
       fetchUserList();
+      utils_eventBus.emitter.on("updateFollowingList", () => {
+        console.log("收到更新事件");
+        fetchUserList();
+      });
     });
     return (_ctx, _cache) => {
       return common_vendor.e({

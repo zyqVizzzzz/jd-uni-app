@@ -19,11 +19,11 @@
 
 			<view class="stats-row">
 				<view class="stats">
-					<view class="stat-item" @tap="navigateToFollows('following')">
+					<view class="stat-item">
 						<text class="number">{{ userInfo.followingCount || 0 }}</text>
 						<text class="label">关注</text>
 					</view>
-					<view class="stat-item" @tap="navigateToFollows('followers')">
+					<view class="stat-item">
 						<text class="number">{{ userInfo.followersCount || 0 }}</text>
 						<text class="label">粉丝</text>
 					</view>
@@ -214,7 +214,7 @@ import { ref, onMounted } from "vue";
 import { userRelationsApi } from "@/api/userRelations";
 import { pointApi } from "@/api/points";
 import { momentApi } from "@/api/moments.js"; // 确保路径正确
-
+import emitter from "@/utils/eventBus";
 import { request } from "@/utils/require";
 import { onLoad, onHide } from "@dcloudio/uni-app";
 
@@ -323,6 +323,7 @@ onLoad((options) => {
 
 // 获取标签页内容
 const fetchTabContent = async () => {
+	console.log(activeTab.value);
 	if (activeTab.value === "dynamics") {
 		await fetchDynamics();
 	} else {
@@ -477,6 +478,8 @@ const handleFollow = async () => {
 		}
 
 		userInfo.value.isFollowing = !userInfo.value.isFollowing;
+		fetchUserInfo();
+		emitter.emit("updateFollowingList");
 		uni.showToast({
 			title: userInfo.value.isFollowing ? "关注成功" : "取消关注成功",
 			icon: "success",

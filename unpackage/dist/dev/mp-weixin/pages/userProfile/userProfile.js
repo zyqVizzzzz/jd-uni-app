@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const api_userRelations = require("../../api/userRelations.js");
 const api_points = require("../../api/points.js");
 const api_moments = require("../../api/moments.js");
+const utils_eventBus = require("../../utils/eventBus.js");
 const utils_require = require("../../utils/require.js");
 require("../../config.js");
 const _sfc_main = {
@@ -14,7 +15,6 @@ const _sfc_main = {
     }
   },
   setup(__props) {
-    const props = __props;
     const userId = common_vendor.ref("");
     const activeTab = common_vendor.ref("dynamics");
     const isLoading = common_vendor.ref(false);
@@ -98,6 +98,7 @@ const _sfc_main = {
       }
     });
     const fetchTabContent = async () => {
+      console.log(activeTab.value);
       if (activeTab.value === "dynamics") {
         await fetchDynamics();
       }
@@ -230,6 +231,8 @@ const _sfc_main = {
           await api_userRelations.userRelationsApi.followUser(userId.value);
         }
         userInfo.value.isFollowing = !userInfo.value.isFollowing;
+        fetchUserInfo();
+        utils_eventBus.emitter.emit("updateFollowingList");
         common_vendor.index.showToast({
           title: userInfo.value.isFollowing ? "关注成功" : "取消关注成功",
           icon: "success"
@@ -241,11 +244,6 @@ const _sfc_main = {
           icon: "none"
         });
       }
-    };
-    const navigateToFollows = (type) => {
-      common_vendor.index.navigateTo({
-        url: `/pages/follows/follows?type=${type}&userId=${props.userId}`
-      });
     };
     const onRefresh = () => {
       isRefreshing.value = true;
@@ -266,26 +264,24 @@ const _sfc_main = {
         b: common_vendor.t(userInfo.value.nickname),
         c: common_vendor.t(userInfo.value.bio || "简介XXXXXXXXXXXX"),
         d: common_vendor.t(userInfo.value.followingCount || 0),
-        e: common_vendor.o(($event) => navigateToFollows("following")),
-        f: common_vendor.t(userInfo.value.followersCount || 0),
-        g: common_vendor.o(($event) => navigateToFollows("followers")),
-        h: common_vendor.t(points.value || 0),
-        i: common_vendor.t(userInfo.value.isFollowing ? "已关注" : "关注"),
-        j: userInfo.value.isFollowing ? 1 : "",
-        k: common_vendor.o(handleFollow),
-        l: activeTab.value === "dynamics"
+        e: common_vendor.t(userInfo.value.followersCount || 0),
+        f: common_vendor.t(points.value || 0),
+        g: common_vendor.t(userInfo.value.isFollowing ? "已关注" : "关注"),
+        h: userInfo.value.isFollowing ? 1 : "",
+        i: common_vendor.o(handleFollow),
+        j: activeTab.value === "dynamics"
       }, activeTab.value === "dynamics" ? {} : {}, {
-        m: activeTab.value === "dynamics" ? 1 : "",
-        n: common_vendor.o(($event) => switchTab("dynamics")),
-        o: activeTab.value === "badges"
+        k: activeTab.value === "dynamics" ? 1 : "",
+        l: common_vendor.o(($event) => switchTab("dynamics")),
+        m: activeTab.value === "badges"
       }, activeTab.value === "badges" ? {} : {}, {
-        p: activeTab.value === "badges" ? 1 : "",
-        q: common_vendor.o(($event) => switchTab("badges")),
-        r: activeTab.value === "dynamics"
+        n: activeTab.value === "badges" ? 1 : "",
+        o: common_vendor.o(($event) => switchTab("badges")),
+        p: activeTab.value === "dynamics"
       }, activeTab.value === "dynamics" ? common_vendor.e({
-        s: dynamicsList.value.length > 0
+        q: dynamicsList.value.length > 0
       }, dynamicsList.value.length > 0 ? {
-        t: common_vendor.f(dynamicsList.value, (post, index, i0) => {
+        r: common_vendor.f(dynamicsList.value, (post, index, i0) => {
           return common_vendor.e({
             a: common_vendor.t(post.createTime),
             b: common_vendor.t(post.content),
@@ -321,24 +317,24 @@ const _sfc_main = {
             w: index
           });
         }),
-        v: userInfo.value.avatar || "/static/avatar.png",
-        w: common_vendor.t(userInfo.value.nickname)
+        s: userInfo.value.avatar || "/static/avatar.png",
+        t: common_vendor.t(userInfo.value.nickname)
       } : {}) : {}, {
-        x: activeTab.value === "badges"
+        v: activeTab.value === "badges"
       }, activeTab.value === "badges" ? common_vendor.e({
-        y: badgesList.value.length > 0
+        w: badgesList.value.length > 0
       }, badgesList.value.length > 0 ? {
-        z: common_vendor.f(badgesList.value, (badge, index, i0) => {
+        x: common_vendor.f(badgesList.value, (badge, index, i0) => {
           return {
             a: index
           };
         })
       } : {}) : {}, {
-        A: isLoading.value
+        y: isLoading.value
       }, isLoading.value ? {} : {}, {
-        B: common_vendor.o(loadMore),
-        C: isRefreshing.value,
-        D: common_vendor.o(onRefresh)
+        z: common_vendor.o(loadMore),
+        A: isRefreshing.value,
+        B: common_vendor.o(onRefresh)
       });
     };
   }

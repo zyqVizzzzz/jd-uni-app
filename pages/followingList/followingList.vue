@@ -96,6 +96,8 @@
 import { ref, computed, onMounted } from "vue";
 import { request } from "@/utils/require";
 import { userRelationsApi } from "@/api/userRelations.js";
+import { onShow } from "@dcloudio/uni-app";
+import emitter from "@/utils/eventBus";
 
 const activeTab = ref("following");
 const searchKeyword = ref("");
@@ -124,6 +126,7 @@ const switchTab = (tab) => {
 
 // 获取用户列表
 const fetchUserList = async () => {
+	console.log(activeTab.value);
 	if (isLoading.value || (!hasMore.value && page.value > 1)) return;
 
 	isLoading.value = true;
@@ -232,6 +235,10 @@ const navigateToUserProfile = (userId) => {
 
 onMounted(() => {
 	fetchUserList();
+	emitter.on("updateFollowingList", () => {
+		console.log("收到更新事件");
+		fetchUserList();
+	});
 });
 </script>
 
