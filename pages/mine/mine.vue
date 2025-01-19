@@ -65,7 +65,7 @@
 					<swiper-item v-for="(device, index) in devicesList" :key="index">
 						<view class="device-item">
 							<image
-								src="/static/device.png"
+								src="https://test-1251994034.cos.ap-shanghai.myqcloud.com/device.png"
 								class="device-image"
 								mode="aspectFit"
 							/>
@@ -90,7 +90,7 @@
 					<swiper-item>
 						<view class="device-item add-device" @tap="handleAddDevice">
 							<image
-								src="/static/device.png"
+								src="https://test-1251994034.cos.ap-shanghai.myqcloud.com/device.png"
 								class="device-image"
 								mode="aspectFit"
 								@tap="navigateToDevice(device)"

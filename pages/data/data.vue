@@ -491,9 +491,7 @@ onMounted(() => {
 }
 
 .add-record-btn {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
+	margin-top: 20rpx;
 	background-color: #07c160;
 	padding: 12px 24px;
 	border-radius: 50px;

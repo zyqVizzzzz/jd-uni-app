@@ -31,7 +31,11 @@ const _sfc_main = {
       if (!topThree.value || !Array.isArray(topThree.value)) {
         return [];
       }
-      return topThree.value;
+      const reordered = [];
+      reordered[0] = topThree.value[1] || null;
+      reordered[1] = topThree.value[0] || null;
+      reordered[2] = topThree.value[2] || null;
+      return reordered;
     });
     const selectCity = (cityData) => {
       currentCity.value = cityData.city;

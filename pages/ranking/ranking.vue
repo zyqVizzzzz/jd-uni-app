@@ -185,8 +185,17 @@ const displayTopThree = computed(() => {
 		return [];
 	}
 
-	// 如果有数据，始终返回原始顺序
-	return topThree.value;
+	// 创建一个新数组，按照 2-1-3 的顺序重排
+	const reordered = [];
+
+	// 第二名放在第一位
+	reordered[0] = topThree.value[1] || null;
+	// 第一名放在中间
+	reordered[1] = topThree.value[0] || null;
+	// 第三名放在最后
+	reordered[2] = topThree.value[2] || null;
+
+	return reordered;
 });
 
 // 处理地区点击

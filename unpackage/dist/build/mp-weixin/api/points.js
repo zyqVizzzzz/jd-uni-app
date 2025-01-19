@@ -1,0 +1,1 @@
+"use strict";const t=require("../utils/require.js"),s={getDailyTasks:s=>t.request({url:"/points/daily-tasks",method:"GET",data:s}),getUserPoints:s=>t.request({url:"/points",method:"GET",data:s}),getPointsHistory:s=>t.request({url:"/points/history",method:"GET",data:s})};exports.pointApi=s;

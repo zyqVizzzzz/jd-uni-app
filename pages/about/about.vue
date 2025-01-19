@@ -16,7 +16,7 @@
 		<!-- 奖项展示 -->
 		<view class="awards-section">
 			<image
-				src="/static/about-us.png"
+				src="https://test-1251994034.cos.ap-shanghai.myqcloud.com/about.png"
 				mode="widthFix"
 				class="awards-image"
 			></image>

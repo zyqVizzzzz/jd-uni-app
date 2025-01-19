@@ -25,7 +25,12 @@
     "pages/share/share",
     "pages/points/points",
     "pages/points/details",
-    "pages/message/message"
+    "pages/message/message",
+    "pages/agreement/user",
+    "pages/about/about",
+    "pages/agreement/point",
+    "pages/userProfile/userProfile",
+    "pages/followingList/followingList"
   ],
   "window": {
     "navigationBarTextStyle": "black",
